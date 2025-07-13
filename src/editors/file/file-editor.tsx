@@ -1,3 +1,4 @@
+// todo this could really be in the same file as the file editor registry
 import events from ":global/events.ts"
 import debug from ":global/log.ts"
 
@@ -30,27 +31,28 @@ customElement(
     )
     const editorName = lb.registries.fileEditor.matchName(props.url)
     const editor = lb.registries.fileEditor.get(editorName!)
-    log(`editor for ${props.url} is ${editorName}`, editor)
+    log(`editor for ${props.url} is ${editorName}`)
     if (!editor) {
       console.warn(`editor not found ${editor}`)
       return <div>imagine there was a useful error message here</div>
     }
     return (
-      <pass-thru attr:editor={editorName}>
-        <Suspense>
-          {editor({
-            url: props.url,
-            bytes: bytes() ?? new Uint8Array(),
-            // async save(newBytes: Uint8Array) {
-            // await filesystem.writeFile(props.url, newBytes)
-            // },
-          })}
-        </Suspense>
-      </pass-thru>
+      <Suspense>
+        {editor({
+          url: props.url,
+          bytes: bytes() ?? new Uint8Array(),
+          async save(newBytes: Uint8Array) {
+            await filesystem.writeFile(props.url, newBytes)
+          },
+        })}
+      </Suspense>
     )
   },
 )
 
 events.once("lb:url-handler-registry:installed", () => {
+  log("registering file url handler")
+  lb.registries.urlHandler.register("file-editor", "file-editor")
   lb.registries.urlHandler.addPattern([/^file:/, "file-editor"])
+  log("registered file url handler")
 })

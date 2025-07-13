@@ -35,6 +35,10 @@ const dynamicPanel: PanelMaker = (opts) => {
       element.firstElementChild?.dispatchEvent(
         new CustomEvent("lb:layout"),
       )
+      // localStorage.setItem(
+      // dockviewLayoutKey(),
+      // JSON.stringify(dockview.toJSON()),
+      // )
     },
     focus() {
       element.firstElementChild?.dispatchEvent(
@@ -68,9 +72,10 @@ function open(
   if (typeof url == "string") {
     url = new URL(url, lb.workingDirectory)
   }
-  console.log("opening", { url })
   const urlHandlerComponent = lb.registries.urlHandler.match(url)
-  console.log({ urlHandlerComponent })
+  if (!urlHandlerComponent) {
+    throw new Error(`no url handler for ${url}`)
+  }
   const pathparts = url.pathname.split("/")
   const end = pathparts[pathparts.length - 1]
   dockview
@@ -82,7 +87,7 @@ function open(
       // tabComponent: "file",
       position: {
         direction: opts?.position ??
-          lb.settings?.panels?.defaults?.position ?? "right",
+          lb.settings?.panels?.defaults?.position ?? "within",
       },
       params: {
         title: end,
@@ -98,13 +103,16 @@ function open(
 // then can have `component: "file"` kind of thing too...
 // maybe this is already good enough, though? webs as the language
 // they could also register themselves as a protocol like new URL("tetris:")
-function term() {
+function term(
+  opts?: { position?: "left" | "right" | "above" | "below" | "within" },
+) {
   dockview.addPanel({
     id: Math.random().toString(36).slice(2),
     component: "dynamic",
     renderer: "always",
     position: {
-      direction: "right",
+      direction: opts?.position ??
+        lb.settings?.panels?.defaults?.position ?? "right",
     },
     params: {
       title: "terminal",
@@ -175,7 +183,7 @@ events.once("lb:early-init", () => {
   lb.dock = { _dockview: dockview, open, term }
   lb.set("panels", {
     defaults: {
-      position: "right",
+      position: "within",
     },
   })
 })

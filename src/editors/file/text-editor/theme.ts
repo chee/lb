@@ -11,6 +11,7 @@ export const ui = {
   },
   ".cm-content": {
     caretColor: "var(--text-editor-cursor-fill)",
+    fontFamily: "var(--editor-family-code)",
   },
   ".cm-cursor, .cm-dropCursor": {
     borderLeft: "1px solid var(--text-editor-cursor-fill)",

@@ -1,22 +1,56 @@
 import events from ":global/events.ts"
 import "./language-registry.ts"
-import { FileEditor } from ":global/file-editor.ts"
-import { log as fileEditorLog } from "../file-editor.tsx"
+import { FileEditor } from ":global/file-editor-registry.ts"
+import { Text } from "@codemirror/state"
+
 import TextEditor from "./codemirror.ts"
-export const log = fileEditorLog.extend("text-editor")
+import debug from ":global/log.ts"
+import { keymap } from "@codemirror/view"
+export const log = debug.extend("text-file-editor")
+
+const textmap = new Map<string, Text>()
 
 const decoder = new TextDecoder()
 const encoder = new TextEncoder()
+// todo if i got passed the panel element or id or something there'd be a way
+// for me to listen to events. that's shouldn't be dockview specific. when you
+// make a Panel in anything you should set it up that focusing that panel makes
+// it the .active and then there can be an event or something to listen to for
+// when you get made active
 const textEditor: FileEditor = (props) => {
-  const content = decoder.decode(props.bytes)
+  const stored = textmap.get(props.url.pathname)
+
+  let content = stored
+  // i don't know if there's a way of making two codemirror instances share the
+  // same underlying text object lol maybe i should use automerge to sync them,
+  // create an automerge doc for every loaded text file and add the sync
+  // plugin... it would work
+  if (!stored || stored.length != props.bytes.length) {
+    const txt = decoder.decode(props.bytes)
+    content = Text.of(txt.split("\n"))
+    textmap.set(props.url.pathname, content)
+  }
+
   const languageName = lb.registries.textEditorLanguage.matchName(props.url)
-  console.log({ languageName })
+  log(`the language for ${props.url} is ${languageName}`)
+
   const language = lb.registries.textEditorLanguage.get(languageName)
 
   const editor = new TextEditor({
-    content,
+    content: content,
     language: language?.(props),
+    extensions: [
+      keymap.of([{
+        key: "Meta-s",
+        run() {
+          props.save(encoder.encode(editor.view.state.doc.toString()))
+          return true
+        },
+      }]),
+    ],
   })
+
+  // textmap.set(props.url, editor.view.state.doc)
   // todo now we need to:
   // 1. run the hooks for this language name from lb.hooks.textEditorLanguage
   // 2. grab all the minor modes from lb.active.modes

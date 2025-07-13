@@ -1,11 +1,9 @@
-import { autocompletion } from "@codemirror/autocomplete"
 import {
   drawSelection,
   EditorView,
   highlightActiveLine,
   highlightActiveLineGutter,
   highlightSpecialChars,
-  highlightTrailingWhitespace,
   KeyBinding,
   lineNumbers,
   rectangularSelection,
@@ -16,11 +14,7 @@ import {
   searchKeymap,
 } from "@codemirror/search"
 
-import {
-  defaultHighlightStyle,
-  indentUnit,
-  syntaxHighlighting,
-} from "@codemirror/language"
+import { indentUnit } from "@codemirror/language"
 import {
   cursorSubwordBackward,
   cursorSubwordForward,
@@ -34,15 +28,22 @@ import {
   selectSubwordBackward,
   selectSubwordForward,
 } from "@codemirror/commands"
-import { Compartment, EditorState, type Extension } from "@codemirror/state"
+import {
+  Compartment,
+  EditorState,
+  type Extension,
+  type Text,
+} from "@codemirror/state"
 import theme from "./theme.ts"
 import { mod, modshift } from "../../../util/modshift.ts"
 
-export interface BaseEditorOpts {
-  content?: string
+export interface TextEditorOpts {
+  content?: string | Text
+  state?: EditorState
   language?: Extension
   parent?: HTMLElement
   shadow?: ShadowRoot
+  extensions?: Extension
 }
 
 export const defaultKeyMap = [
@@ -87,19 +88,20 @@ export const defaultKeyMap = [
 
 export default class TextEditor {
   // keymap = new Compartment()
-  // extensions = new Compartment()
+  extensions = new Compartment()
   language = new Compartment()
   view: EditorView
-  constructor(opts: BaseEditorOpts) {
+  constructor(opts: TextEditorOpts) {
     // todo replace this with some kind of modes system
-    // const extensions = this.extensions.of(opts.extensions ?? [])
+    const extensions = this.extensions.of(opts.extensions ?? [])
     // const keys = this.keymap.of(keymap.of(opts.keymap ?? defaultKeyMap))
 
     const language = this.language.of(opts.language ?? [])
     this.view = new EditorView({
+      state: opts.state,
       root: opts.shadow,
       parent: opts.parent,
-      doc: opts.content ?? "",
+      doc: opts.content,
       extensions: [
         theme,
         search(),
@@ -130,6 +132,7 @@ export default class TextEditor {
           },
         }),
         language,
+        extensions,
       ],
     })
   }
@@ -142,19 +145,19 @@ export default class TextEditor {
     this.view.dispatch({ effects: effect })
   }
 
-  // getExtensions() {
-  //   return this.extensions.get(this.view.state) ?? []
-  // }
+  getExtensions() {
+    return this.extensions.get(this.view.state) ?? []
+  }
 
   // addExtension(ext: Extension) {
   //   const effect = this.extensions.reconfigure([this.getExtensions(), ext])
   //   this.view.dispatch({ effects: effect })
   // }
 
-  // setExtensions(ext: Extension) {
-  //   const effect = this.extensions.reconfigure(ext)
-  //   this.view.dispatch({ effects: effect })
-  // }
+  setExtensions(ext: Extension) {
+    const effect = this.extensions.reconfigure(ext)
+    this.view.dispatch({ effects: effect })
+  }
 
   // setTheme(theme: TextEditorTheme) {
   //   const effect = this.theme.reconfigure(themeExtension(theme))

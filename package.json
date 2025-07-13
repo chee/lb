@@ -1,5 +1,6 @@
 {
 	"dependencies": {
+		"@codemirror/lang-yaml": "^6.1.2",
 		"@codemirror/language": "^6.11.2",
 		"@lezer/highlight": "^1.2.1",
 		"@tauri-apps/plugin-cli": "~2.4.0",
