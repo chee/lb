@@ -1,0 +1,174 @@
+@import "./theme.css";
+
+:root {
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-text-size-adjust: 100%;
+}
+
+*,
+::before,
+::after {
+	box-sizing: inherit;
+}
+
+html {
+	box-sizing: border-box;
+	-moz-tab-size: var(--default-tab-size);
+	tab-size: var(--default-tab-size);
+	font-size: var(--workspace-font-size);
+	font-weight: var(--workspace-font-weight);
+	background: var(--workspace-fill);
+	color: var(--workspace-line);
+	font-family: var(--workspace-family-sans);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*:before,
+	*:after {
+		animation-duration: 0.001s !important;
+		transition-duration: 0.001s !important;
+		animation-iteration-count: 1 !important;
+	}
+}
+* {
+	overscroll-behavior: none;
+}
+abbr[title] {
+	text-decoration: underline dotted;
+}
+b,
+strong {
+	font-weight: bolder;
+}
+code,
+kbd,
+samp,
+pre {
+	font-family: var(--workspace-family-code);
+	font-size: 1em;
+}
+small {
+	font-size: 80%;
+}
+sub,
+sup {
+	font-size: 75%;
+	line-height: 0;
+	position: relative;
+	vertical-align: baseline;
+}
+sub {
+	bottom: -0.25em;
+}
+sup {
+	top: -0.5em;
+}
+table {
+	text-indent: 0;
+	border-color: inherit;
+}
+figure,
+button,
+input,
+optgroup,
+select,
+textarea {
+	font-family: inherit;
+	font-size: 100%;
+	margin: 0;
+}
+
+button,
+select {
+	text-transform: none;
+}
+
+html {
+	box-sizing: border-box;
+}
+
+img,
+video {
+	height: auto;
+	max-width: 100%;
+	image-rendering: pixelated;
+}
+
+a:active,
+a:hover {
+	outline-width: 0;
+}
+
+dialog {
+	padding: 0;
+}
+
+[hidden] {
+	display: none !important;
+}
+
+[contenteditable] {
+	outline: 0;
+}
+
+html {
+	overscroll-behavior: none;
+}
+
+body {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+body,
+e-d-i-t,
+html {
+	height: 100dvh;
+	width: 100dvw;
+	overflow: hidden;
+}
+
+e-d-i-t {
+	overflow: hidden;
+	display: flex;
+	height: calc(100dvh - 2rem);
+}
+
+e-c-h-o {
+	height: 2rem;
+	border-top: 1px solid var(--workspace-fill-offset-10);
+}
+
+main {
+	height: 100%;
+	width: 100%;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+}
+
+pass-thru {
+	display: contents;
+	height: 100%;
+	width: 100%;
+	> * {
+		height: 100%;
+		width: 100%;
+	}
+}
+
+.dv-render-overlay {
+	overflow: scroll;
+}
+
+file-editor {
+	> * {
+		height: 100%;
+		width: 100%;
+	}
+}

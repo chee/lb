@@ -1,13 +1,34 @@
 {
+	"private": "true",
+	"name": "lb",
+	"description": "lb",
+	"license": "AGPL-3.0-only",
+	"scripts": {
+		"dev": "tauri dev"
+	},
 	"dependencies": {
+		"@automerge/automerge-codemirror": "^0.1.0",
+		"@codemirror/autocomplete": "^6.18.6",
+		"@codemirror/commands": "^6.8.1",
+		"@codemirror/lang-css": "^6.3.1",
+		"@codemirror/lang-javascript": "^6.2.4",
+		"@codemirror/lang-json": "^6.0.2",
+		"@codemirror/lang-markdown": "^6.3.3",
 		"@codemirror/lang-yaml": "^6.1.2",
 		"@codemirror/language": "^6.11.2",
+		"@codemirror/lsp-client": "^6.0.0",
+		"@codemirror/search": "^6.5.11",
+		"@codemirror/state": "^6.5.2",
+		"@codemirror/view": "^6.38.0",
 		"@lezer/highlight": "^1.2.1",
+		"@tauri-apps/api": "^2.6.0",
+		"@tauri-apps/cli": "^2.6.2",
 		"@tauri-apps/plugin-cli": "~2.4.0",
 		"@tauri-apps/plugin-dialog": "~2.3.0",
 		"@tauri-apps/plugin-fs": "~2.4.0",
 		"@tauri-apps/plugin-global-shortcut": "~2.3.0",
 		"@tauri-apps/plugin-notification": "~2.3.0",
+		"@tauri-apps/plugin-opener": "^2.4.0",
 		"@tauri-apps/plugin-shell": "~2.3.0",
 		"@tauri-apps/plugin-store": "~2.3.0",
 		"@tauri-apps/plugin-stronghold": "~2.3.0",
@@ -17,6 +38,7 @@
 		"@valtown/codemirror-ts": "3.0.0-14",
 		"@xterm/addon-canvas": "^0.7.0",
 		"@xterm/addon-clipboard": "^0.1.0",
+		"@xterm/addon-fit": "^0.10.0",
 		"@xterm/addon-image": "^0.8.0",
 		"@xterm/addon-ligatures": "^0.9.0",
 		"@xterm/addon-search": "^0.15.0",
@@ -24,8 +46,26 @@
 		"@xterm/addon-web-links": "^0.11.0",
 		"@xterm/xterm": "^5.5.0",
 		"debug": "^4.4.1",
+		"dockview-core": "^4.4.0",
 		"eventemitter3": "^5.0.1",
 		"hotkeys-js": "^3.13.15",
-		"style-mod": "^4.1.2"
+		"solid-element": "^1.9.1",
+		"solid-js": "^1.9.7",
+		"style-mod": "^4.1.2",
+		"tauri-pty": "^0.1.0",
+		"vite": "^7.0.4",
+		"vite-plugin-solid": "^2.11.7",
+		"vite-plugin-wasm": "^3.5.0",
+		"vscode-langservers-extracted": "^4.10.0"
+	},
+	"devDependencies": {
+		"@types/dottie": "^2.0.7",
+		"jspm": "^4.0.3",
+		"prettier": "^3.6.2"
+	},
+	"version": "dev",
+	"type": "module",
+	"exports": {
+		".": "./public/lb.js"
 	}
 }
