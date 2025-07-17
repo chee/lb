@@ -17,14 +17,19 @@ call("add-to-list", get("text-editor-languages.patterns"), [
 
 const decoder = new TextDecoder()
 const encoder = new TextEncoder()
+
+defvar("surface-file", {}, "A map of surface to their current file object")
+defcmd("surface-file", id => call("object-get", "surface-file", id))
+
 lb.registerView("file", async surface => {
 	const fileEditorName = call(
 		"match-url-pattern",
 		get("file-editors.patterns"),
 		surface.url
 	)
+
 	const file = await readFile(surface.url)
-	surface.file = file
+	call("object-set", "surface-file", surface.id, file)
 
 	if (fileEditorName) {
 		const fileEditor = get(`file-editors.${fileEditorName}`)

@@ -26,3 +26,19 @@ defcmd(
 		return fallback
 	}
 )
+
+defcmd("object-get", (name, key, defaultValue) => {
+	;`Get ${key} from a the object named ${name}, returning ${defaultValue} if the property is not found.`
+	const object = get(name)
+	if (key in object) {
+		return object[key]
+	}
+	return defaultValue
+})
+
+defcmd("object-set", (name, key, value) => {
+	;`Set ${key} to ${value} in the object named ${name}.`
+	const object = get(name)
+	object[key] = value
+	return object
+})

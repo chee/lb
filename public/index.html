@@ -6,6 +6,7 @@
 		{
 			"imports": {
 				"littlebootstraps": "./tauri-littleboot.js",
+				"@littlebook/": "./stdlib/",
 				"@lezer/highlight": "https://esm.sh/@lezer/highlight",
 				"@codemirror/commands": "https://esm.sh/@codemirror/commands",
 				"@codemirror/lang-css": "https://esm.sh/@codemirror/lang-css",
@@ -35,18 +36,18 @@
 		#eruda-console .eruda-js-input.eruda-active textarea {
 			display: none !important;
 		}
-	
+
 		.eruda-js-input.eruda-active .cm-editor {
 			height: 100%;
 		}
-	
+
 		.eruda-js-input:not(.eruda-active) .cm-editor {
 			display: none
 		}
 		`
 		const input = shadow.querySelector(".eruda-js-input")
 		const textarea = input.querySelector("textarea")
-	
+
 		import TextEditor from "./stdlib/views/file/text-editor/codemirror.js"
 		import { javascript } from "@codemirror/lang-javascript"
 		import { EditorView, keymap, } from "@codemirror/view"
@@ -116,13 +117,13 @@
 			]
 		})
 		textarea.addEventListener("mousedown", () => {
-	
+
 			setTimeout(() => {
 				editor.view.focus()
-	
+
 			})
 		})
-	
+
 		input.append(editor.element) */
 
 </script>
