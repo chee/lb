@@ -1,0 +1,29 @@
+{
+	"$schema": "https://swc.rs/schema.json",
+	"jsc": {
+		"parser": {
+			"syntax": "typescript",
+			"jsx": false,
+			"dynamicImport": true,
+			"privateMethod": false,
+			"functionBind": true,
+			"exportDefaultFrom": true,
+			"exportNamespaceFrom": true,
+			"decorators": false,
+			"decoratorsBeforeExport": false,
+			"topLevelAwait": true,
+			"importMeta": true
+		},
+		"transform": {},
+		"target": "esnext",
+		"loose": false,
+		"externalHelpers": false,
+		"keepClassNames": true
+	},
+	"module": {
+		"type": "es6",
+		"strict": true,
+		"preserveImportMeta": true
+	},
+	"minify": false
+}

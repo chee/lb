@@ -1,0 +1,14 @@
+:root,
+[theme] {
+  --terminal-family: var(--workspace-family-code);
+  --terminal-font-size: var(--editor-font-size);
+  --terminal-fill: var(--editor-fill);
+  --terminal-line: var(--editor-line);
+  --terminal-selection-fill: var(--editor-selection-fill);
+  --terminal-cursor-fill: var(--editor-cursor-fill);
+}
+
+.terminal {
+  width: 100%;
+  height: 100%;
+}
