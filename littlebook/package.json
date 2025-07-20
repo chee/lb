@@ -71,7 +71,7 @@
 		"vscode-langservers-extracted": "^4.10.0"
 	},
 	"scripts": {
-		"build": "rolldown -c rollup.config.ts",
+		"build": "node build.js",
 		"dev": "pnpm build -w"
 	}
 }

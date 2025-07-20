@@ -1,0 +1,17 @@
+the echo buffer can be click to open up the repl
+import whatever from littlebook
+import protocol from littlebook
+extend protocol handlers with ts
+add protocol handlers
+protocol handlers take a url and return a LittlebookResponse
+LittlebookResponse extends Response. automerge: adds .docHandle() example
+.text() secretly uses same text object behind the scenes maybe for files?
+though the text editor thing will be operating on a _response_ now (not codemirror, that's still a string)
+draw this idea out!
+how does new file work? haha
+i guess id have to choose a type up front because it might not be text
+new TEXT file is different. lol could use about:blank as the url
+worker transforms import to lb.import, which goes through the worker
+worker transforms urls to whatever is in lb.importmap
+lb.import uses lb.fetch, checks protocol handler, etc
+the bootstrap needs to set up a stdlib location, a config file location, and a protocol handler for whatever protocol those use

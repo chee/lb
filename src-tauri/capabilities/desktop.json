@@ -1,31 +1,30 @@
 {
-  "identifier": "desktop-capability",
-  "platforms": [
-    "macOS",
-    "windows",
-    "linux"
-  ],
-  "windows": [
-    "main"
-  ],
-  "permissions": [
-    "global-shortcut:default",
-    "pty:default",
-    "opener:default",
-    "global-shortcut:default",
-    "cli:default",
-    "notification:default",
-    "shell:default",
-    "store:default",
-    "stronghold:default",
-    "websocket:default",
-    "window-state:default",
-    "dialog:default",
-    "fs:read-all",
-    "fs:write-all",
-    {
-      "identifier": "fs:scope",
-      "allow": [{ "path": "/" }, { "path": "/**/*" }]
-    }
-  ]
+	"identifier": "desktop-capability",
+	"platforms": ["macOS", "windows", "linux"],
+	"windows": ["main"],
+	"permissions": [
+		"global-shortcut:default",
+		"pty:default",
+		"opener:default",
+		"global-shortcut:default",
+		"cli:default",
+		"notification:default",
+		"shell:default",
+		"store:default",
+		"stronghold:default",
+		"websocket:default",
+		"window-state:default",
+		"dialog:default",
+		"fs:read-all",
+		"fs:write-all",
+		"fs:allow-create",
+		"fs:allow-exists",
+		"fs:allow-fstat",
+		"fs:allow-remove",
+		"fs:allow-watch",
+		{
+			"identifier": "fs:scope",
+			"allow": [{"path": "/"}, {"path": "/**/*"}]
+		}
+	]
 }

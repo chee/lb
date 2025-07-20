@@ -36,7 +36,12 @@ fn initial_environment_variables() -> std::collections::HashMap<String, String> 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let port: u16 = std::env::var("TAURI_PORT")
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or(12551);
     tauri::Builder::default()
+        .plugin(tauri_plugin_localhost::Builder::new(port).build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_websocket::init())

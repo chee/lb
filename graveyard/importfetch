@@ -1,0 +1,46 @@
+async fetch(url: string | URL) {
+		if (typeof url == "string") {
+			url = new URL(url, this.cwd)
+		}
+		const handler = this.protocol.get(url.protocol as keyof LittlebookHandleMap)
+		if (!handler) {
+			if (url.protocol == "http:" || url.protocol == "https:") {
+				return self.fetch(url)
+			}
+		}
+		return handler(url)
+	}
+	// todo import cache perhaps with mtime/etag check
+	async import(url: URL | string) {
+		if (typeof url == "string") {
+			if (url in this.importmap) {
+				url = this.importmap[url]
+			} else {
+				url = new URL(url, this.cwd)
+			}
+		}
+		return this.fetch(url).then(async response => {
+			if (response.ok) {
+				if ("bytes" in response) {
+					const bytes = await response.bytes()
+					const blob = new Blob([bytes], {type: "application/javascript"})
+					return import(URL.createObjectURL(blob))
+				} else if ("text" in response && typeof response.text === "function") {
+					const text = await response.text()
+					const blob = new Blob([text], {type: "application/javascript"})
+					return import(URL.createObjectURL(blob))
+				} else {
+					// todo interesting, because i probably need to have two kinds of protocol handlers?
+					// an import handler and a fetch handler.. maybe?
+					// or, actually!!!!!!! the response could have a .import() method?
+					// hmmm, maybe that's not possible.... it's like,
+					// how does an automerge url with javascript living on a specifc path become importable?
+					// where is that configured? who does it? maybe it doesn't need to be
+					// what is import for? the idea is replacing imports with lb.import
+					throw new Error(
+						`response for ${url} does not have bytes or text method`
+					)
+				}
+			}
+		})
+	}

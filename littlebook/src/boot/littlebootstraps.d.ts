@@ -1,13 +1,15 @@
+declare type LittlebookHostFileType = "file" | "directory" | "link"
+
 declare interface LittlebookHost {
-	read: (path: string | URL) => Promise<string>
+	read: (path: string | URL) => Promise<Uint8Array>
 	write: (path: string | URL, bytes: Uint8Array) => Promise<void>
 	list: (
 		path: string | URL
-	) => Promise<{name: string; type: "file" | "directory" | "link"}[]>
+	) => Promise<{name: string; type: LittlebookHostFileType}[]>
 	stat: (path: string | URL) => Promise<{
 		size: number
 		modified: Date
-		type: "file" | "directory" | "link"
+		type: LittlebookHostFileType
 	}>
 	env: Record<string, string>
 	cwd: string | URL
@@ -23,4 +25,5 @@ declare var __littlebook: {
 	host: LittlebookHost
 	esbuild: typeof esbuild
 	bundle: (path: string, options: BuildOptions) => Promise<BuildResult>
+	output: BuildResult
 }

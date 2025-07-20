@@ -1,0 +1,143 @@
+
+	/**
+	 * @param {string|URL} path
+	 */
+	style(path: string | URL) {
+		const link = document.createElement("link")
+		link.rel = "stylesheet"
+		link.href = path.toString()
+		document.head.appendChild(link)
+	}
+	// todo bring this stuff back when the integration with esbuild is understood
+
+	//  	/**
+	// 	 * @param {string} name
+	// 	 * @param {function} command
+	// 	 */
+	// 	defineCommand(name: string, command: function) {
+	// 		if (Littlebook.exists(this.cmd, name)) {
+	// 			console.warn(`overwriting command: "${name}"`)
+	// 		}
+	// 		const info = getFunctionInfo(command, new Error().stack)
+
+	// 		Littlebook.set(
+	// 			this.cmd,
+	// 			name,
+	// 			{...info, call: command},
+	// 			{readonly: true, force: true}
+	// 		)
+	// 		this.dispatchEvent(new CustomEvent(`lb:defcmd:${name}`, {detail: info}))
+	// 	}
+
+	// 	/**
+	// 	 * @param {string} name
+	// 	 * @param {function} initialValue
+	// 	 * @param {string} doc
+	// 	 */
+	// 	defineSetting(name: string, initialValue: function, doc: string) {
+	// 		if (Littlebook.exists(this.var, name)) {
+	// 			console.warn(`overwriting setting: "${name}"`)
+	// 		}
+	// 		const [, callee] = parseStack(new Error().stack)
+
+	// 		Littlebook.set(this.var, name, {
+	// 			doc,
+	// 			value: initialValue,
+	// 			source: callee?.source,
+	// 			line: callee?.line,
+	// 			column: callee?.column,
+	// 		})
+
+	// 		this.dispatchEvent(
+	// 			new CustomEvent(`lb:defvar:${name}`, {detail: initialValue})
+	// 		)
+	// 	}
+
+	// 	defvar = this.defineSetting.bind(this)
+	// 	defcmd = this.defineCommand.bind(this)
+
+	// 	/**
+	// 	 * @param {string} name
+	// 	 * @param {any} value
+	// 	 */
+	// 	set(name: string, value: any) {
+	// 		Littlebook.set(this.var, `${name}.value`, value)
+	// 		this.dispatchEvent(new CustomEvent(`lb:set:${name}`, {detail: value}))
+	// 	}
+
+	// 	/**
+	// 	 * @template T
+	// 	 * @param {string} name
+	// 	 * @param {T} [defaultValue]
+	// 	 * @returns {T}
+	// 	 */
+	// 	get<T>(name: string, defaultValue: T): T {
+	// 		return Littlebook.get(this.var, `${name}.value`, defaultValue)
+	// 	}
+
+	// 	/**
+	// 	 * @param {string} name
+	// 	 * @param {any[]} args
+	// 	 */
+	// 	call(name: string, ...args: any[]) {
+	// 		try {
+	// 			return this.getcmd(name).apply(null, args)
+	// 		} catch (error) {
+	// 			console.error(`error calling command "${name}"`, error)
+	// 			throw error
+	// 		}
+	// 	}
+
+	// 	/**
+	// 	 * @param {string} name
+	// 	 */
+	// 	getcmd(name: string) {
+	// 		if (!Littlebook.exists(this.cmd, name)) {
+	// 			throw new Error(`no command named "${name}"`)
+	// 		}
+	// 		return Littlebook.get(this.cmd, `${name}.call`)
+	// 	}
+
+	// 	/**
+	// 	 * @param {string} name
+	// 	 */
+	// 	describeCommand(name: string) {
+	// 		if (!Littlebook.exists(this.cmd, name)) {
+	// 			throw new Error(`no docs for command named "${name}"`)
+	// 		}
+	// 		const cmd = Littlebook.get(this.cmd, name)
+	// 		const loc = cmd.source
+	// 			? `defined at <${cmd.source}:${cmd.line}:${cmd.column}>`
+	// 			: "without a source location"
+
+	// 		return `\`${name}\` is a${
+	// 			cmd.interactive ? "n interactive" : ""
+	// 		} command ${loc}.\n\n${cmd.doc ?? ""}`
+	// 	}
+
+	// 	/**
+	// 	 * @param {string} name
+	// 	 */
+	// 	describeSetting(name: string) {
+	// 		if (!Littlebook.exists(this.var, name)) {
+	// 			throw new Error(`no docs for setting named "${name}"`)
+	// 		}
+	// 		return Littlebook.get(this.var, name)
+	// 	}
+
+	// 	/**
+	// 	 *
+	// 	 * @param {typeof this.var} settings
+	// 	 * @param {function} fn
+	// 	 */
+	// 	let(settings: typeof this.var, fn: function) {
+	// 		const backup = {}
+	// 		for (const [name, value] of Object.entries(settings)) {
+	// 			backup[name] = this.get(name)
+	// 			this.set(name, value)
+	// 		}
+	// 		fn()
+	// 		for (const [name, value] of Object.entries(backup)) {
+	// 			this.set(name, value)
+	// 		}
+	// 	}

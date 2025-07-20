@@ -1,31 +1,41 @@
 {
-  "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Littlebook",
-  "version": "0.1.0",
-  "identifier": "app.littlebook.desktop",
-  "build": {
-    "beforeDevCommand": "deno task front:dev",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "deno task front:build",
-    "frontendDist": "../dist"
-  },
-  "app": {
-    "windows": [],
-    "security": {
-      "csp": null
-    }
-  },
-  "bundle": {
-    "active": true,
-    "targets": "all",
-    "icon": [
-      "icons/32.png",
-      "icons/64.png",
-      "icons/256.png",
-      "icons/512.png",
-      "icons/1024.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
-  }
+	"$schema": "https://schema.tauri.app/config/2",
+	"productName": "Littlebook",
+	"version": "0.1.0",
+	"identifier": "app.littlebook.desktop",
+	"mainBinaryName": "lb",
+	"build": {
+		"beforeDevCommand": "pnpm dev:tauri:littlebook",
+		"beforeBuildCommand": "pnpm build:tauri:littlebook",
+		"devUrl": "http://localhost:2025",
+		"frontendDist": "../dist/tauri/"
+	},
+	"app": {
+		"withGlobalTauri": true,
+		"windows": [],
+		"security": {
+			"csp": null
+		}
+	},
+	"plugins": {
+		"fs": {
+			"requireLiteralLeadingDot": false
+		}
+	},
+	"bundle": {
+		"resources": ["../littlebook/src", "../LICENSE"],
+		"category": "public.app-category.productivity",
+		"active": true,
+		"targets": "all",
+		"license": "AGPL-3.0",
+		"icon": [
+			"icons/32.png",
+			"icons/64.png",
+			"icons/256.png",
+			"icons/512.png",
+			"icons/1024.png",
+			"icons/icon.icns",
+			"icons/icon.ico"
+		]
+	}
 }

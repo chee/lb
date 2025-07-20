@@ -3,7 +3,3 @@ declare interface Window {
 		fs: typeof import("@tauri-apps/plugin-fs")
 	}
 }
-
-declare module "/esbuild.js" {
-	var esbuild: typeof import("esbuild-wasm")
-}
