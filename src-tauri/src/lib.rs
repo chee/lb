@@ -1,4 +1,5 @@
-use tauri::TitleBarStyle;
+use tauri::path::BaseDirectory;
+use tauri::{Manager, TitleBarStyle};
 use tauri::{Url, WebviewUrl, WebviewWindowBuilder};
 
 #[tauri::command]
@@ -34,14 +35,44 @@ fn initial_environment_variables() -> std::collections::HashMap<String, String> 
     std::env::vars().collect()
 }
 
+#[tauri::command]
+fn install(handle: tauri::AppHandle, system_directory: String, user_directory: String) -> Option<bool> {
+    use std::fs;
+
+    let system_resource_path = handle.path().resolve("system", BaseDirectory::Resource).ok()?;
+
+    println!("Installing system resources from: {}, to: {}", system_resource_path.display(), system_directory);
+
+    // Create system directory if it doesn't exist
+    if !fs::metadata(&system_directory).is_ok() {
+        if let Err(e) = fs::create_dir_all(&system_directory) {
+            eprintln!("Failed to create system directory: {}", e);
+            return None;
+        }
+    }
+
+    // Create user directory if it doesn't exist
+    if !fs::metadata(&user_directory).is_ok() {
+        if let Err(e) = fs::create_dir_all(&user_directory) {
+            eprintln!("Failed to create user directory: {}", e);
+            return None;
+        }
+    }
+
+    // recursively copy all files from system_resource_path to system_directory
+    if let Err(e) = fs::copy(system_resource_path, &system_directory) {
+        eprintln!("Failed to copy system resources: {}", e);
+        return None;
+    }
+
+    Some(true)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let port: u16 = std::env::var("TAURI_PORT")
-        .ok()
-        .and_then(|p| p.parse().ok())
-        .unwrap_or(12551);
     tauri::Builder::default()
-        .plugin(tauri_plugin_localhost::Builder::new(port).build())
+        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_cache::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_websocket::init())
@@ -84,7 +115,8 @@ pub fn run() {
             greet,
             initial_working_directory,
             initial_environment_variables,
-            find_parent_dir_containing
+            find_parent_dir_containing,
+            install
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

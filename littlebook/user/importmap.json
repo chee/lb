@@ -1,0 +1,5 @@
+{
+	"imports": {
+		"fake-xyz": "https://esm.sh/solid-js"
+	}
+}

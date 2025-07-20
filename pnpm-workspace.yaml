@@ -1,5 +1,0 @@
-packages:
-  - ./littlebook
-  - ./bootstraps
-onlyBuiltDependencies:
-  - "@swc/core"

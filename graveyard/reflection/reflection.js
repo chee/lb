@@ -1,8 +1,8 @@
-import * as acorn from "../vendor/acorn/acorn-loose.js"
+import * as acorn from "./acorn/acorn-loose.js"
 import parseStack from "./stack.js"
 
 /**
- * @import Acorn from "../vendor/acorn/acorn.js"
+ * @import Acorn from "./acorn/acorn.js"
  */
 
 /**

@@ -8,7 +8,7 @@
 		"beforeDevCommand": "pnpm dev:tauri:littlebook",
 		"beforeBuildCommand": "pnpm build:tauri:littlebook",
 		"devUrl": "http://localhost:2025",
-		"frontendDist": "../dist/tauri/"
+		"frontendDist": "../littlebook/dist"
 	},
 	"app": {
 		"withGlobalTauri": true,
@@ -23,7 +23,7 @@
 		}
 	},
 	"bundle": {
-		"resources": ["../littlebook/src", "../LICENSE"],
+		"resources": ["../littlebook/system", "../LICENSE"],
 		"category": "public.app-category.productivity",
 		"active": true,
 		"targets": "all",
