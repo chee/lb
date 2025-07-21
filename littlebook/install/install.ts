@@ -96,7 +96,32 @@ async function setup() {
 
 	if (importmaps.length > 0) {
 		debug("merging importmaps")
-		window.__lb_importmap = Object.assign({}, ...importmaps.map(m => m))
+		const maps = importmaps.reduce(
+			(acc, map) => {
+				for (const [key, value] of Object.entries(map.imports || {})) {
+					if (acc.imports[key] && acc.imports[key] !== value) {
+						console.warn(
+							`Duplicate import map entry for "${key}": "${acc.imports[key]}" and
+"${value}". Using "${value}".`
+						)
+					}
+					acc.imports[key] = value
+				}
+				for (const [key, value] of Object.entries(map.scopes || {})) {
+					if (acc.scopes[key] && acc.scopes[key] !== value) {
+						console.warn(
+							`Duplicate import map scope for "${key}": "${acc.scopes[key]}" and
+"${value}". Using "${value}".`
+						)
+					}
+					acc.scopes[key] = value
+				}
+				return acc
+			},
+			{imports: {}, scopes: {}}
+		)
+
+		window.__lb_importmap = maps
 	}
 	performance.mark("importmap:end")
 	setbg("#fffafa")

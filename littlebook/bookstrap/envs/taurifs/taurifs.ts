@@ -10,16 +10,30 @@ import type {
 		return
 	}
 	const tauri = window.__TAURI__
+
+	function fixurl(url: string | URL) {
+		if (typeof url === "string") {
+			if (!url.startsWith("taurifs:") && !url.startsWith("file:")) {
+				url = `taurifs://${url}`
+			}
+			url = new URL(url)
+		}
+		if (url.protocol === "taurifs:") {
+			url.protocol = "file:"
+		}
+		return url
+	}
+
 	async function read(path: string | URL) {
-		return tauri.fs.readFile(path)
+		return tauri.fs.readFile(fixurl(path))
 	}
 
 	async function write(path: string | URL, bytes: Uint8Array) {
-		return tauri.fs.writeFile(path, bytes)
+		return tauri.fs.writeFile(fixurl(path), bytes)
 	}
 
 	async function list(path: string | URL) {
-		const entries = await tauri.fs.readDir(path)
+		const entries = await tauri.fs.readDir(fixurl(path))
 		return entries.map(
 			entry =>
 				({
@@ -34,7 +48,7 @@ import type {
 	}
 
 	async function stat(path: string | URL) {
-		const stat = await tauri.fs.stat(path)
+		const stat = await tauri.fs.stat(fixurl(path))
 		return {
 			size: stat.size,
 			modified: stat.mtime,

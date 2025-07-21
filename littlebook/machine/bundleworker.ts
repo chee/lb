@@ -72,7 +72,12 @@ async function initialize(env: LbEnvironment) {
 	})
 
 	// this way you get sourcemaps
-	await import(URL.createObjectURL(jsBlob))
+	try {
+		await import(URL.createObjectURL(jsBlob))
+	} catch (error) {
+		console.error("Failed to import bundled script:", error)
+		throw error
+	}
 
 	const css = output.outputFiles.find(f => f.path.endsWith(".css"))
 	if (css) {

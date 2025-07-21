@@ -8,7 +8,6 @@ export type * from "./protocol.ts"
 export type * from "./handle.ts"
 const native = window.__lb_native_env
 import {TextEditor} from "../stdlib/views/text-editor/text-editor.ts"
-console.log("here?")
 
 window.addEventListener("keydown", e => {
 	if (e.key == "r" && e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey) {
@@ -390,48 +389,50 @@ export default new Littlebook()
 
 const textEncoder = new TextEncoder()
 const textDecoder = new TextDecoder()
-lb.protocol.register(
-	native.protocol == "taurifs:" ? "file:" : native.protocol,
-	async (url: URL) => {
-		try {
-			const content = native.read(url)
-			return {
-				url,
-				ok: true,
-				body: null,
-				bodyUsed: false,
-				async blob() {
-					return new Blob([await content], {type: mime(url.toString())})
-				},
-				async bytes() {
-					return content
-				},
-				async json() {
-					const bytes = await content
-					return JSON.parse(textDecoder.decode(bytes))
-				},
-				async text() {
-					const bytes = await content
-					return textDecoder.decode(bytes)
-				},
-				async stat() {
-					return native.stat(url)
-				},
-				async save(data: Uint8Array | string) {
-					if (typeof data == "string") {
-						lb.log("saving text", textEncoder.encode(data).length)
-						await native.write(url, textEncoder.encode(data))
-					} else {
-						lb.log("saving bytes")
-						await native.write(url, data)
-					}
-				},
-			} satisfies LbFilehandle
-		} catch (error) {
-			return {ok: false, url}
-		}
+lb.protocol.register(native.protocol, async (url: URL) => {
+	try {
+		const content = native.read(url)
+		return {
+			url,
+			ok: true,
+			body: null,
+			bodyUsed: false,
+			async blob() {
+				return new Blob([await content], {type: mime(url.toString())})
+			},
+			async bytes() {
+				return content
+			},
+			async json() {
+				const bytes = await content
+				return JSON.parse(textDecoder.decode(bytes))
+			},
+			async text() {
+				const bytes = await content
+				return textDecoder.decode(bytes)
+			},
+			async stat() {
+				return native.stat(url)
+			},
+			async save(data: Uint8Array | string) {
+				if (typeof data == "string") {
+					lb.log("saving text", textEncoder.encode(data).length)
+					await native.write(url, textEncoder.encode(data))
+				} else {
+					lb.log("saving bytes")
+					await native.write(url, data)
+				}
+			},
+		} satisfies LbFilehandle
+	} catch (error) {
+		return {ok: false, url}
 	}
-)
+})
+
+if (native.protocol == "taurifs:") {
+	lb.protocol.register("file:", lb.protocol.get("taurifs:" as "file:")!)
+}
+
 ;(async () => {
 	const {DockviewSurfaceLayer} = await import("../stdlib/layers/dock/dock.ts")
 	const {TextEditor} = await import(
@@ -454,15 +455,3 @@ declare global {
 	}
 }
 
-function applyMixins(derivedCtor: any, constructors: any[]) {
-	constructors.forEach(baseCtor => {
-		Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
-			Object.defineProperty(
-				derivedCtor.prototype,
-				name,
-				Object.getOwnPropertyDescriptor(baseCtor.prototype, name) ||
-					Object.create(null)
-			)
-		})
-	})
-}
