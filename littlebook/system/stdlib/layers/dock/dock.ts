@@ -1,9 +1,9 @@
-import type {LbHandle, LbSurfaceLayer} from "littlebook"
+import type {LbResourceHandle, LbSurfaceLayer} from "littlebook"
 import "./dock.css"
 import * as Dockview from "dockview-core/dist/dockview-core.esm.js"
 const log = littlebook.log.extend("dock-surface-manager")
 declare module "littlebook" {
-	interface LbSurface<H extends LbHandle = LbHandle> {
+	interface LbSurface<H extends LbResourceHandle = LbResourceHandle> {
 		_dockAPI?: Dockview.DockviewPanelApi
 	}
 }

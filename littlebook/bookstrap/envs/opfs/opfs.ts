@@ -92,7 +92,7 @@ class OPFSHostClient implements LbEnvironment {
 		const result = await this.callWorker("stat", path.toString())
 		return {
 			...result,
-			modified: new Date(result.modified),
+			modified: result.modified ? new Date(result.modified) : null,
 		}
 	}
 

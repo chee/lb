@@ -1,10 +1,10 @@
-export interface LbHandle {
+export interface LbResourceHandle {
 	readonly url: URL
 	readonly ok: boolean
 }
 
 // todo FileHandle might be part of stdlib
-export interface LbFilehandle extends LbHandle {
+export interface LbFilehandle extends LbResourceHandle {
 	readonly body: ReadableStream<Uint8Array> | null
 	readonly bodyUsed: boolean
 	blob(): Promise<Blob>
@@ -26,7 +26,7 @@ export interface LbHandlemap {
 
 export type LbHandleForProtocol<T extends string> = T extends keyof LbHandlemap
 	? LbHandlemap[T]
-	: LbHandle
+	: LbResourceHandle
 
 export type LbHandleForURL<T extends URL | string> = T extends URL & {
 	protocol: infer P extends keyof LbHandlemap
@@ -34,4 +34,4 @@ export type LbHandleForURL<T extends URL | string> = T extends URL & {
 	? LbHandlemap[P]
 	: T extends `${infer P extends keyof LbHandlemap}${string}`
 	? LbHandlemap[P]
-	: LbHandle
+	: LbResourceHandle

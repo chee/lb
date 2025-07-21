@@ -1,33 +1,7 @@
 /// <reference lib="webworker" />
 
-import type {LbEnvironment} from "../../bookstrap.ts"
+import type {LbEnvironment, LbFilesystemStat} from "../../bookstrap.ts"
 
-export interface OPFSWorkerMessageMap {
-	read: [string, Uint8Array]
-	write: [string, Uint8Array]
-	list: [string, {name: string; type: "file" | "directory"}]
-	stat: [
-		string,
-		{size: number; modified: Date | null; type: "file" | "directory"}
-	]
-	mkdir: [string, {parents?: boolean}]
-	props: [
-		string,
-		{
-			cwd: string
-			env: Record<string, string>
-			systemDirectory: string
-			userDirectory: string
-			protocol: string
-		}
-	]
-	install: []
-	uninstall: []
-	rm: [string, {recursive?: boolean; force?: boolean}]
-}
-/**
- * @implements {}
- */
 class OPFSHost implements LbEnvironment {
 	cwd: LbEnvironment["cwd"]
 	env: LbEnvironment["env"]
@@ -186,7 +160,8 @@ class OPFSHost implements LbEnvironment {
 				modified: new Date(file.lastModified),
 				/** @type {LittlebookFilesystemFileType} */
 				type: "file",
-			}
+				readonly: false,
+			} satisfies LbFilesystemStat
 		} catch (error) {
 			try {
 				await this.getDirectoryHandle(pathSegments)
@@ -195,6 +170,7 @@ class OPFSHost implements LbEnvironment {
 					modified: null,
 					/** @type {LittlebookFilesystemFileType} */
 					type: "directory",
+					readonly: false,
 				}
 			} catch (dirError) {
 				throw new Error(`Path not found: ${path}`)

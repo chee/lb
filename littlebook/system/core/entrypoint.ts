@@ -1,6 +1,6 @@
 import "./styles/styles.css"
 import {createProtocolHandlerRegistry} from "./protocol.ts"
-import type {LbHandlemap, LbHandle, LbFilehandle} from "./handle.ts"
+import type {LbHandlemap, LbResourceHandle, LbFilehandle} from "./handle.ts"
 import createDebug from "./logger.ts"
 import {createRegistry} from "./structures/registry.ts"
 import {mime} from "./mimes.ts"
@@ -55,7 +55,7 @@ export interface LbSurfaceEventsMap {
 	place: void
 }
 
-export interface LbSurface<H extends LbHandle = LbHandle> {
+export interface LbSurface<H extends LbResourceHandle = LbResourceHandle> {
 	id: string
 	modes: LbMode[]
 	events: LbEmitter<LbSurfaceEventsMap>
@@ -70,7 +70,7 @@ export interface LbSurface<H extends LbHandle = LbHandle> {
 	// todo think about unsaved state, mtime at open, etc
 }
 
-export interface LbView<H extends LbHandle = LbHandle> {
+export interface LbView<H extends LbResourceHandle = LbResourceHandle> {
 	name: string
 	render(element: NativeElement): Promise<void> | void
 	surface?: LbSurface<H>
@@ -79,7 +79,7 @@ export interface LbView<H extends LbHandle = LbHandle> {
 	destroy?(): void
 }
 
-export type LbViewCreator<H extends LbHandle = LbHandle> =
+export type LbViewCreator<H extends LbResourceHandle = LbResourceHandle> =
 	| (new (surface: LbSurface<H>) => LbView<H>)
 	| ((surface: LbSurface<H>) => LbView<H>)
 
@@ -178,8 +178,9 @@ export class Littlebook {
 	log = logger
 	protocol = createProtocolHandlerRegistry()
 	renderer = new LittlebookHTML()
-	modes = createRegistry<LbHandle, LbModeCreator>("mode")
-	views = createRegistry<LbHandle, LbViewCreator>("view")
+	modes = createRegistry<LbResourceHandle, LbModeCreator>("mode")
+	views = createRegistry<LbResourceHandle, LbViewCreator>("view")
+	nativefs = native
 
 	constructor() {
 		try {
@@ -201,7 +202,6 @@ export class Littlebook {
 		} = {}
 	) {
 		if (typeof url == "string") {
-			console.log(this.workingDirectory)
 			url = new URL(url, this.workingDirectory)
 		}
 		const id = Math.random().toString(36).slice(2)
@@ -225,7 +225,7 @@ export class Littlebook {
 		if (!handler) {
 			throw new Error(`no protocol handler for "${url.protocol}"`)
 		}
-		const handle = (await handler(url)) as LbHandle
+		const handle = (await handler(url)) as LbResourceHandle
 
 		if (!handle) {
 			throw new Error(`no handle for "${url}"`)
@@ -341,7 +341,6 @@ export class Littlebook {
 		callback: (element: NativeElement) => LbSurfaceLayer,
 		options?: {auto?: boolean}
 	) {
-		console.log(this, this.layers)
 		if (this.layers[name]) {
 			console.warn(`Overwriting surface layer "${name}". did u mean to?`)
 		}
@@ -454,4 +453,3 @@ declare global {
 		littlebook: Littlebook
 	}
 }
-

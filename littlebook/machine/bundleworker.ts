@@ -102,6 +102,12 @@ async function initialize(env: LbEnvironment) {
 		"machine:end"
 	)
 	console.log(
-		`machine initialized in ${machineMeasure.duration}ms, ${bundleMeasure.duration}ms of which was bundling the entrypoint`
+		`machine %cinitialized%c in %C${machineMeasure.duration}ms%c, of which %c${bundleMeasure.duration}ms %Cwas bundling the entrypoint`,
+		"color: green",
+		"color: black",
+		"color: blue; font-weight: bold",
+		"color: black",
+		"color: blue; font-weight: bold",
+		"font-weight: normal; color: black"
 	)
 }

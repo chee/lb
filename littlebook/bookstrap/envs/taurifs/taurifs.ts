@@ -53,6 +53,7 @@ import type {
 			size: stat.size,
 			modified: stat.mtime,
 			type: stat.isDirectory ? "directory" : stat.isSymlink ? "link" : "file",
+			readonly: stat.readonly,
 		} satisfies LbFilesystemStat
 	}
 
@@ -112,12 +113,10 @@ import type {
 		rm,
 		async install() {
 			// todo make noop in dev
-			console.log(
-				await tauri.core.invoke("install", {
-					systemDirectory,
-					userDirectory,
-				})
-			)
+			await tauri.core.invoke("install", {
+				systemDirectory,
+				userDirectory,
+			})
 		},
 		async uninstall() {
 			await rm(systemDirectory, {recursive: true, force: true})
