@@ -48,7 +48,7 @@ async function setup() {
 	performance.mark("install:start")
 	if (localStorage.getItem("littlebook-never-install") == "true") {
 		debug("not installing: user said NEVER")
-
+	} else {
 		if (localStorage.getItem("littlebook-always-install") == "true") {
 			debug("installing: forced by localStorage.littlebook-always-install")
 			await install()
