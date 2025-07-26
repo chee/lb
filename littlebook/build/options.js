@@ -6,7 +6,11 @@ const bookstrapOptions = {
 	define: {
 		"self.LITTLEBUILDDATE": JSON.stringify(new Date().toISOString()),
 	},
-	entryPoints: ["./bookstrap/**", "./install/**"],
+	entryPoints: [
+		"./bookstrap/**",
+		// todo remove after https://bugzilla.mozilla.org/show_bug.cgi?id=1969527
+		"./machine/serviceworker.ts",
+	],
 	outdir: "./dist",
 	loader: {".html": "copy", ".txt": "copy", ".wasm": "copy"},
 	platform: "browser",
@@ -53,7 +57,7 @@ export default bookstrapOptions
 
 /** @type {import("esbuild").BuildOptions} */
 export const machineOptions = {
-	entryPoints: ["./machine/bundleworker.ts"],
+	entryPoints: ["./machine/transformer.ts"],
 	outdir: `${bookstrapOptions.outdir}/machine`,
 	bundle: true,
 	platform: "browser",

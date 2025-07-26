@@ -25,5 +25,5 @@
 		"outDir": "./dist"
 	},
 	"include": ["littlebook"],
-	"exclude": ["littlebook/bookstrap/service-worker.ts"]
+	"exclude": ["littlebook/machine/serviceworker.ts"]
 }

@@ -1,3 +1,5 @@
+import "./styles/styles.css"
+import "./styles/theme.css"
 import {createProtocolHandlerRegistry} from "./protocol.ts"
 import type {LbFilehandle, LbHandle, LbHandleMap} from "./handle.ts"
 import createDebug from "./logger.ts"
@@ -413,8 +415,6 @@ try {
 }
 
 export default new Littlebook()
-lb.style(import.meta.resolve("./styles/styles.css"))
-lb.style(import.meta.resolve("./styles/theme.css"))
 
 // todo mode
 const textEncoder = new TextEncoder()
@@ -463,7 +463,7 @@ if (nativefs.protocol == "taurifs:") {
 	lb.protocol.register("file:", lb.protocol.get("taurifs:" as "file:")!)
 }
 
-;(async () => {
+queueMicrotask(async () => {
 	const {DockviewSurfaceLayer} = await import("../stdlib/layers/dock/dock.ts")
 	const {TextEditor} = await import(
 		"../stdlib/views/text-editor/text-editor.ts"
@@ -474,11 +474,17 @@ if (nativefs.protocol == "taurifs:") {
 	await lb.open(
 		nativefs.systemDirectory.toString().concat("core/entrypoint.ts")
 	)
-	const userScript = "/littlebook:user/init.ts"
-	import(userScript)
-})()
+	queueMicrotask(async () => {
+		const userScript = "/littlebook:user/init.ts"
+
+		await import(userScript).catch(error => {
+			console.error(`Failed to load user script "${userScript}":`, error)
+		})
+	})
+})
 
 declare global {
+	var __lb_error_context: Error | null | undefined
 	var lb: Littlebook
 	var littlebook: Littlebook
 	interface Window {

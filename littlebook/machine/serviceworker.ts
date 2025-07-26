@@ -27,6 +27,8 @@ async function transform(
 		platform: "browser",
 		format: "esm",
 		sourcefile: url.toString(),
+		target: "esnext",
+		logLevel: "debug",
 		...options,
 	})
 }
@@ -50,22 +52,35 @@ self.addEventListener("install", async () => {
 const readResponses = new Map<string, PromiseWithResolvers<Uint8Array>>()
 
 self.addEventListener("message", async (messageEvent: MessageEvent) => {
-	if (messageEvent.data.type !== "read") return
-	const responseItem = readResponses.get(messageEvent.data.id)
-	if (!responseItem) {
-		console.error(`No read response found for id ${messageEvent.data.id}`)
+	if (messageEvent.data.type == "read") {
+		const responseItem = readResponses.get(messageEvent.data.id)
+		if (!responseItem) {
+			console.error(`No read response found for id ${messageEvent.data.id}`)
+		}
+		if (messageEvent.data.error) {
+			responseItem.reject(new Error(messageEvent.data.error))
+			return
+		}
+		responseItem.resolve(messageEvent.data.bytes)
+	} else if (messageEvent.data.type == "postprocess") {
+		const responseItem = readResponses.get(messageEvent.data.id)
+		if (!responseItem) {
+			console.error(
+				`No postprocess response found for id ${messageEvent.data.id}`
+			)
+		}
+		if (messageEvent.data.error) {
+			responseItem.reject(new Error(messageEvent.data.error))
+			return
+		}
+		responseItem.resolve(messageEvent.data.bytes)
 	}
-	if (messageEvent.data.error) {
-		responseItem.reject(new Error(messageEvent.data.error))
-		return
-	}
-	responseItem.resolve(messageEvent.data.bytes)
 })
 
 self.addEventListener("fetch", async (fetchEvent: FetchEvent) => {
+	const request = fetchEvent.request
 	// todo ???
-	if (fetchEvent.request.method !== "GET")
-		return fetchEvent.respondWith(fetch(fetchEvent.request))
+	if (request.method !== "GET") return fetchEvent.respondWith(fetch(request))
 	const url = new URL(fetchEvent.request.url)
 	let lbImportURL: URL | undefined
 
@@ -79,8 +94,6 @@ self.addEventListener("fetch", async (fetchEvent: FetchEvent) => {
 			lbImportURL = u
 		} catch {}
 	}
-
-	console.log("dewbug key 9")
 
 	fetchEvent.respondWith(
 		(async () => {
@@ -103,8 +116,26 @@ self.addEventListener("fetch", async (fetchEvent: FetchEvent) => {
 					result.warnings.forEach(warning => {
 						console.warn(`esbuild warning: ${warning.text}`)
 					})
-					const response = new Response(result.code, {
-						headers: {"content-type": mime(url.pathname)},
+					let contentType = mime(url.pathname)
+					let code = result.code
+					if (
+						contentType == "text/css" &&
+						fetchEvent.request.destination == "script"
+					) {
+						contentType = "application/javascript"
+						code = /*js*/ `
+						const style = ${JSON.stringify(result.code)}
+						const existing = document.querySelector("style[data-littlebook-css='${
+							url.pathname
+						}']")
+						const element = existing ?? document.createElement("style")
+						element.dataset.littlebookCss = ${JSON.stringify(url.pathname)}
+						element.textContent = style
+						export default style
+						document.head.appendChild(element)`
+					}
+					const response = new Response(code, {
+						headers: {"content-type": contentType},
 						status: 200,
 					})
 					cache.put(fetchEvent.request, response.clone())
@@ -141,50 +172,6 @@ self.addEventListener("fetch", async (fetchEvent: FetchEvent) => {
 		})()
 	)
 })
-/*
-addEventListener("message", async event => {
-	if (event.data.type == "importmap") {
-		const {importmap} = event.data
-		if (importmap) {
-		}
-	} else if (event.data.type == "extmap") {
-		const {importmap} = event.data
-		if (importmap) {
-		}
-	}
-})
- */
-/**
- * let path = args.path
-				if (path.startsWith(env.protocol)) {
-					path = path.slice(env.protocol.length).replace(/^\/+/, "/")
-				}
-				const isRelative = path.match(/^\./)
-				if (isRelative) {
-					path = args.resolveDir.concat(`/${path}`)
-				}
-
-				if (importmap.imports[path]) {
-					path = importmap.imports[path]
-					// sorry to anyone trying to use the low network bandwidth filesystem
-					const lbfsMatch = path.match(/^(littlebook):(.*)/)
-					if (lbfsMatch) {
-						;[, , path] = lbfsMatch
-						const systemMatch = path.match(/^\/?system\/(.*)/)
-						const userMatch = path.match(/^\/?user\/(.*)/)
-						if (systemMatch) {
-							path = `${env.systemDirectory.toString()}/${systemMatch[1]}`
-						} else if (userMatch) {
-							path = `${env.userDirectory.toString()}/${userMatch[1]}`
-						}
-					} else {
-						const first = path[0]
-						if (!["/", "."].includes(first)) {
-							return {path, external: true}
-						}
-					}
-				}
- */
 
 const mimes = {
 	txt: "text/plain",
@@ -313,7 +300,7 @@ type Mimes = typeof mimes
 export default mimes
 export function mime<Ext extends string>(
 	filename: Ext | `${string}.${Ext}`
-): Ext extends keyof Mimes ? Mimes[Ext] : "application/octet-stream" {
+): Ext extends keyof Mimes ? Mimes[Ext] : Mimes[keyof Mimes] {
 	const ext = filename.toLowerCase().substring(filename.lastIndexOf(".") + 1)
 	return mimes[ext] || "application/octet-stream"
 }

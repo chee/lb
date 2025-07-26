@@ -41,7 +41,11 @@ class OPFSHostClient implements LbEnvironment {
 		if (pending) {
 			this.pendingCalls.delete(id)
 			if (error) {
-				pending.reject(error)
+				pending.reject(
+					new Error(error, {
+						cause: error,
+					})
+				)
 			} else {
 				pending.resolve(result)
 			}

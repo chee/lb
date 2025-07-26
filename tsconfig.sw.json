@@ -21,5 +21,5 @@
 		"lib": ["ESNext"],
 		"outDir": "./dist"
 	},
-	"include": ["littlebook/bookstrap/service-worker.ts"]
+	"include": ["littlebook/machine/serviceworker.ts"]
 }

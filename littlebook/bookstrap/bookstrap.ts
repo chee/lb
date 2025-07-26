@@ -36,16 +36,6 @@ export interface LbEnvironment extends LbFilesystemLibrary {
 	uninstall(): Promise<void> | void
 }
 
-export interface LbContext<Fn extends (...args: any[]) => ReturnType<Fn>> {
-	name: string
-	parent?: LbContext<any>
-	fn: Fn
-	value?: ReturnType<Fn>
-	stack: StackFrame[]
-	children: LbContext<any>[]
-	meta: Record<string, any>
-}
-
 declare global {
 	var __lb_env: Record<LbEnvironment["protocol"], LbEnvironment>
 	var __lb_native_env: LbEnvironment
@@ -57,7 +47,7 @@ window.__lb_importmap = window.__lb_importmap || {imports: {}, scopes: {}}
 var envs = ["taurifs", "opfs"] as const
 
 var count = 0
-performance.mark("bookstrap:start")
+performance.mark("bookstrap->start")
 for (var env of envs) {
 	var url = `/envs/${env}/${env}.js`
 	var script = document.createElement("script")
@@ -74,99 +64,14 @@ for (var env of envs) {
 	}, 5000)
 }
 
-self.__lb_context = null
-
-function __lb_withContext<
-	Fn extends (context: LbContext<Fn>) => ReturnType<Fn>
->(name: string, fn: Fn): ReturnType<Fn> {
-	const parent = self.__lb_context
-
-	const context: LbContext<Fn> = {
-		name: `${parent ? parent.name + ":" : ""}${name}`,
-		stack: parseStack(new Error().stack || ""),
-		children: [],
-		parent,
-		fn,
-		meta: {},
-	}
-
-	self.__lb_context?.children.push(context)
-	self.__lb_context = context
-
-	performance.mark(`${name}->start`)
-	try {
-		context.value = fn(context)
-		return fn(context)
-	} finally {
-		self.__lb_context = self.__lb_context.parent
-		performance.mark(`${name}->end`)
-	}
-}
-
-self.__lb_withContext = __lb_withContext
-
-declare global {
-	var __lb_context: LbContext<any> | null
-	function __lb_withContext<
-		Fn extends (context: LbContext<Fn>) => ReturnType<Fn>
-	>(name: string, fn: Fn): ReturnType<Fn>
-}
-
 if (
 	"window" in self &&
-	// @ts-expect-error shhhh baby it ok
-	self.LITTLEBOOK_DEV
+	"LITTLEBOOK_DEV" in self &&
+	!("esbuildListening" in self)
 ) {
 	new EventSource("/esbuild").addEventListener("change", () =>
 		location.reload()
 	)
-}
-
-function parseStack(stack: string) {
-	if (stack.match(/^\s*at .*(\S+:\d+|\(native\))/m)) {
-		return parseV8(stack)
-	}
-	return parseGeckoWebkit(stack)
-}
-
-export interface StackFrame {
-	source?: string
-	line?: number
-	column?: number
-}
-
-function parseV8(stack: string): StackFrame[] {
-	return stack
-		.split("\n")
-		.slice(1)
-		.map(line => {
-			const match = line.match(/ \((.+):(\d+):(\d+)\)/)
-			if (match) {
-				return {
-					source: match[2],
-					line: parseInt(match[3], 10),
-					column: parseInt(match[4], 10),
-				}
-			} else {
-				return {}
-			}
-		})
-}
-
-function parseGeckoWebkit(stack: string): StackFrame[] {
-	return stack.split("\n").map(line => {
-		if (line == "global code@") {
-			return {}
-		}
-		const match = line.match(/@(.+):(\d+):(\d+)/)
-		if (match) {
-			return {
-				source: match[1],
-				line: parseInt(match[2], 10),
-				column: parseInt(match[3], 10),
-			}
-		} else {
-			return {}
-		}
-	})
+	// @ts-expect-error it's ok
+	window.esbuildListening = true
 }
