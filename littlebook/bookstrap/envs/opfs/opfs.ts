@@ -41,7 +41,7 @@ class OPFSHostClient implements LbEnvironment {
 		if (pending) {
 			this.pendingCalls.delete(id)
 			if (error) {
-				pending.reject(new Error(error))
+				pending.reject(error)
 			} else {
 				pending.resolve(result)
 			}
@@ -149,10 +149,10 @@ class OPFSHostClient implements LbEnvironment {
 ;(async function () {
 	try {
 		const host = new OPFSHostClient()
-		window.__lb_env = window.__lb_env || {}
-		window.__lb_env.opfs = host
-		window.dispatchEvent(new Event("__lb_env:opfs"))
+		self.__lb_env = self.__lb_env || {}
+		self.__lb_env.opfs = host
+		self.dispatchEvent(new Event("__lb_env:opfs"))
 	} catch {
-		window.dispatchEvent(new Event("__lb_env:opfs"))
+		self.dispatchEvent(new Event("__lb_env:opfs"))
 	}
 })()

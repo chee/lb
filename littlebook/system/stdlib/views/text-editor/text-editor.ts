@@ -20,11 +20,11 @@ const languageRegistry = createRegistry<URL | string, TextEditorLanguage>(
 	"text editor language"
 )
 
-// i think this is where i started thinking about the idea of an `lb.createExtension` thing, where you can
-// create an LbExtension, it'll be on `lb.extensions` and its static settings ["a", "b"] properties will
-// be available as settings
-// and its static commands ["c", "d"] will be available as commands to bind keys to
-// or something like a runtime version of the vscode contribution points
+// todo how does the user force choose a language?
+// there was something nice about that idea when a "view" was any chain of functions that eventually returned an html element
+
+// todo i think this is where i started thinking about the idea of an `lb.createPackage` thing, where you can
+// create an LbPackage, it'll be on `lb.packages`. because a view is too much right now, isn't it.
 export class TextEditor implements LbView<LbFilehandle> {
 	name = "xyz.littlebook.text-editor"
 	log = lb.log.extend("text-editor")
@@ -41,7 +41,9 @@ export class TextEditor implements LbView<LbFilehandle> {
 		TextEditor.languagePatterns.push([js, "javascript"])
 		TextEditor.languages["javascript"] = JavaScript
 		lb.views.registerMatcher(handle => {
-			return !!handle.url.pathname.match(js)
+			return TextEditor.languagePatterns.some(([pattern]) =>
+				handle.url.toString().match(pattern)
+			)
 		}, this.name)
 	}
 	constructor(public readonly surface: LbSurface<LbFilehandle>) {}
@@ -50,7 +52,7 @@ export class TextEditor implements LbView<LbFilehandle> {
 
 	async render(element: HTMLElement) {
 		const languageName = TextEditor.languagePatterns.find(([pattern]) =>
-			this.surface.handle.url.pathname.match(pattern)
+			this.surface.handle.url.toString().match(pattern)
 		)?.[1]
 
 		const language = TextEditor.languages[languageName ?? "plain"]
@@ -65,7 +67,7 @@ export class TextEditor implements LbView<LbFilehandle> {
 		const codemirror = new Codemirror({
 			parent: element,
 			content: await this.surface.handle.text(),
-			language: language?.(this.surface.handle.url),
+			language: language?.(new URL(this.surface.handle.url)),
 			extensions: [
 				keymap.of([
 					{

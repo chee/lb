@@ -1,6 +1,6 @@
 import type {LbSurfaceLayer} from "littlebook"
 
-const defaultLayer: LbSurfaceLayer = (function () {
+export const defaultLayer: LbSurfaceLayer = (function () {
 	const elements = new Map<string, HTMLElement>()
 	function place(id: string) {
 		const el = document.createElement("little-surface")

@@ -11,6 +11,7 @@
 		"start": "pnpm dev:tauri",
 		"dev": "pnpm start",
 		"dev:tauri": "tauri dev",
+		"dev:littlebook": "LITTLEBOOK_HOST=web cd littlebook && PORT=1239 node build/serve.js",
 		"dev:tauri:littlebook": "LITTLEBOOK_HOST=desktop cd littlebook && node build/serve.js",
 		"build": "pnpm build:tauri",
 		"build:tauri": "tauri build",

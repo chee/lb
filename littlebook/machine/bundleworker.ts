@@ -28,21 +28,7 @@ async function initialize(env: LbEnvironment) {
 			format: "esm",
 			...options,
 			plugins: [
-				{
-					name: "importmap",
-					setup(ctx) {
-						ctx.onResolve({filter: /^[^./]/}, args => {
-							if (importmap.imports[args.path]) {
-								return {
-									path: importmap.imports[args.path],
-									external: true,
-								}
-							}
-							return {path: args.path, external: true}
-						})
-					},
-				},
-				littlebookfs(__lb_native_env),
+				littlebookfs(__lb_native_env, importmap),
 				...self.__lb_esbuildPlugins,
 				...(options?.plugins ?? []),
 			],
@@ -102,7 +88,7 @@ async function initialize(env: LbEnvironment) {
 		"machine:end"
 	)
 	console.log(
-		`machine %cinitialized%c in %C${machineMeasure.duration}ms%c, of which %c${bundleMeasure.duration}ms %Cwas bundling the entrypoint`,
+		`machine %cinitialized%c in %c${machineMeasure.duration}ms%c, of which %c${bundleMeasure.duration}ms %cwas bundling the entrypoint`,
 		"color: green",
 		"color: black",
 		"color: blue; font-weight: bold",

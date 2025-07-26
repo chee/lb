@@ -35,6 +35,9 @@ importers:
       rollup-plugin-dev:
         specifier: ^2.0.5
         version: 2.0.5
+      service-worker-types:
+        specifier: npm:@types/serviceworker@^0.0.146
+        version: '@types/serviceworker@0.0.146'
 
 packages:
 
@@ -374,6 +377,9 @@ packages:
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
+
+  '@types/serviceworker@0.0.146':
+    resolution: {integrity: sha512-0aCmij37nArc1bXObQ//8Dj0EBWs6y+p+oUCUNxbOg9qXXjIgD5XBHHebAWFxKpmt/D1QGEFrovF0bblIHU8Yw==}
 
   abstract-logging@2.0.1:
     resolution: {integrity: sha512-2BjRTZxTPvheOvGbBslFSYOUkr+SjPtOnrLP33f+VIWLzezQpZcqVg7ja3L4dBXmzzgwT+a029jRx5PCi3JuiA==}
@@ -1060,6 +1066,8 @@ snapshots:
     optional: true
 
   '@types/estree@1.0.8': {}
+
+  '@types/serviceworker@0.0.146': {}
 
   abstract-logging@2.0.1: {}
 

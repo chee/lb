@@ -1,12 +1,10 @@
-export interface LbResourceHandle {
-	readonly url: URL
-	readonly ok: boolean
+export interface LbHandle {
+	url: string | URL
+	ok: boolean
 }
 
-// todo FileHandle might be part of stdlib
-export interface LbFilehandle extends LbResourceHandle {
-	readonly body: ReadableStream<Uint8Array> | null
-	readonly bodyUsed: boolean
+// todo this should be a class probably but i'm too tired to think
+export interface LbFilehandle extends LbHandle {
 	blob(): Promise<Blob>
 	bytes(): Promise<Uint8Array>
 	json(): Promise<any>
@@ -20,18 +18,18 @@ export interface LbFilehandle extends LbResourceHandle {
 	save(bytes: Uint8Array): Promise<void>
 }
 
-export interface LbHandlemap {
+export interface LbHandleMap {
 	"file:": LbFilehandle
 }
 
-export type LbHandleForProtocol<T extends string> = T extends keyof LbHandlemap
-	? LbHandlemap[T]
-	: LbResourceHandle
+export type LbHandleForProtocol<T extends string> = T extends keyof LbHandleMap
+	? LbHandleMap[T]
+	: LbHandle
 
 export type LbHandleForURL<T extends URL | string> = T extends URL & {
-	protocol: infer P extends keyof LbHandlemap
+	protocol: infer P extends keyof LbHandleMap
 }
-	? LbHandlemap[P]
-	: T extends `${infer P extends keyof LbHandlemap}${string}`
-	? LbHandlemap[P]
-	: LbResourceHandle
+	? LbHandleMap[P]
+	: T extends `${infer P extends keyof LbHandleMap}${string}`
+	? LbHandleMap[P]
+	: LbHandle

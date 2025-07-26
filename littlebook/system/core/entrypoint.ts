@@ -1,19 +1,19 @@
-import "./styles/styles.css"
 import {createProtocolHandlerRegistry} from "./protocol.ts"
-import type {LbHandlemap, LbResourceHandle, LbFilehandle} from "./handle.ts"
+import type {LbFilehandle, LbHandle, LbHandleMap} from "./handle.ts"
 import createDebug from "./logger.ts"
 import {createRegistry} from "./structures/registry.ts"
 import {mime} from "./mimes.ts"
 export type * from "./protocol.ts"
 export type * from "./handle.ts"
-const native = window.__lb_native_env
 import {TextEditor} from "../stdlib/views/text-editor/text-editor.ts"
+import {defaultLayer} from "../stdlib/layers/default.ts"
 
 window.addEventListener("keydown", e => {
 	if (e.key == "r" && e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey) {
 		location.reload()
 	}
 })
+
 const logger = createDebug("littlebook")
 
 export function createEventEmitter<T>(): LbEmitter<T> {
@@ -55,7 +55,7 @@ export interface LbSurfaceEventsMap {
 	place: void
 }
 
-export interface LbSurface<H extends LbResourceHandle = LbResourceHandle> {
+export interface LbSurface<H extends LbHandle = LbHandle> {
 	id: string
 	modes: LbMode[]
 	events: LbEmitter<LbSurfaceEventsMap>
@@ -70,16 +70,18 @@ export interface LbSurface<H extends LbResourceHandle = LbResourceHandle> {
 	// todo think about unsaved state, mtime at open, etc
 }
 
-export interface LbView<H extends LbResourceHandle = LbResourceHandle> {
+export interface LbView<H extends LbHandle = LbHandle> {
 	name: string
 	render(element: NativeElement): Promise<void> | void
+	// todo what do we think of this alternative of a view being able to have an element rather than a render?
+	element?: NativeElement
 	surface?: LbSurface<H>
 	refit?(): void
 	focus?(): void
 	destroy?(): void
 }
 
-export type LbViewCreator<H extends LbResourceHandle = LbResourceHandle> =
+export type LbViewCreator<H extends LbHandle = LbHandle> =
 	| (new (surface: LbSurface<H>) => LbView<H>)
 	| ((surface: LbSurface<H>) => LbView<H>)
 
@@ -172,15 +174,16 @@ export interface SerializedSurface {
 	view?: string
 }
 
+const nativefs = window.__lb_native_env
 export class Littlebook {
 	extensions: LbExtensions = {} as LbExtensions
 	events = createEventEmitter<LbEventsMap>()
 	log = logger
 	protocol = createProtocolHandlerRegistry()
 	renderer = new LittlebookHTML()
-	modes = createRegistry<LbResourceHandle, LbModeCreator>("mode")
-	views = createRegistry<LbResourceHandle, LbViewCreator>("view")
-	nativefs = native
+	modes = createRegistry<LbHandle, LbModeCreator>("mode")
+	views = createRegistry<LbHandle, LbViewCreator>("view")
+	nativefs = nativefs
 
 	constructor() {
 		try {
@@ -206,7 +209,7 @@ export class Littlebook {
 		}
 		const id = Math.random().toString(36).slice(2)
 		let layer: LbSurfaceLayer
-		this.log(`opening ${url} with id ${id}`)
+
 		if (options.layer) {
 			const lay = this.getLayer(options.layer)
 			if (!lay) {
@@ -216,21 +219,25 @@ export class Littlebook {
 		} else {
 			layer = this.currentLayer
 		}
+
 		if (!layer) {
 			console.warn("no surface layer found, using main area")
-			layer = this.defaultLayer
+			layer = defaultLayer
 		}
 
-		const handler = this.protocol.get(url.protocol as keyof LbHandlemap)
+		const handler = this.protocol.get(url.protocol as keyof LbHandleMap)
+
 		if (!handler) {
 			throw new Error(`no protocol handler for "${url.protocol}"`)
 		}
-		const handle = (await handler(url)) as LbResourceHandle
+
+		const handle = (await handler(url)) as LbHandle
 
 		if (!handle) {
 			throw new Error(`no handle for "${url}"`)
 		}
-		const parts = handle.url.pathname.split("/")
+
+		const parts = url.pathname.split("/")
 		const name = parts[parts.length - 1]
 		// todo this needs to be in some kind of createSurface function
 		const Modes = this.modes.findAll(handle) ?? []
@@ -360,8 +367,8 @@ export class Littlebook {
 		return this.layers[name]
 	}
 
-	workingDirectory = new URL(".", native.cwd)
-	environmentVariables: Record<string, string> = native.env ?? {}
+	workingDirectory = new URL(".", nativefs.cwd)
+	environmentVariables: Record<string, string> = nativefs.env ?? {}
 
 	changeDirectory(url: URL): void {
 		this.workingDirectory = url
@@ -376,6 +383,27 @@ export class Littlebook {
 		this.environmentVariables[name] = value
 		lb.events.emit(`env:${name}`, value)
 	}
+
+	import(url: URL | string): Promise<any> {
+		if (typeof url != "string") {
+			url = url.toString()
+		}
+
+		try {
+			url = new URL(url)
+		} catch (error) {
+			url = new URL(import.meta.resolve(url.toString()))
+		}
+
+		return import("/" + url)
+	}
+
+	async style(url: URL | string) {
+		const style = document.createElement("style")
+		style.textContent = await (await fetch(url)).text()
+		document.head.append(style)
+		return style
+	}
 }
 
 try {
@@ -385,41 +413,44 @@ try {
 }
 
 export default new Littlebook()
+lb.style(import.meta.resolve("./styles/styles.css"))
+lb.style(import.meta.resolve("./styles/theme.css"))
 
+// todo mode
 const textEncoder = new TextEncoder()
 const textDecoder = new TextDecoder()
-lb.protocol.register(native.protocol, async (url: URL) => {
+// todo a handle should be a class and it should be cached between reads
+lb.protocol.register(nativefs.protocol, async (url: URL) => {
 	try {
-		const content = native.read(url)
+		let content: Uint8Array | null = null
+		const getContent = async () => {
+			return content ?? (content = await nativefs.read(url))
+		}
 		return {
 			url,
 			ok: true,
-			body: null,
-			bodyUsed: false,
 			async blob() {
-				return new Blob([await content], {type: mime(url.toString())})
+				return new Blob([await getContent()], {type: mime(url.toString())})
 			},
 			async bytes() {
-				return content
+				return await getContent()
 			},
 			async json() {
-				const bytes = await content
-				return JSON.parse(textDecoder.decode(bytes))
+				return JSON.parse(textDecoder.decode(await getContent()))
 			},
 			async text() {
-				const bytes = await content
-				return textDecoder.decode(bytes)
+				return textDecoder.decode(await getContent())
 			},
 			async stat() {
-				return native.stat(url)
+				return nativefs.stat(url)
 			},
 			async save(data: Uint8Array | string) {
 				if (typeof data == "string") {
 					lb.log("saving text", textEncoder.encode(data).length)
-					await native.write(url, textEncoder.encode(data))
+					await nativefs.write(url, textEncoder.encode(data))
 				} else {
 					lb.log("saving bytes")
-					await native.write(url, data)
+					await nativefs.write(url, data)
 				}
 			},
 		} satisfies LbFilehandle
@@ -428,7 +459,7 @@ lb.protocol.register(native.protocol, async (url: URL) => {
 	}
 })
 
-if (native.protocol == "taurifs:") {
+if (nativefs.protocol == "taurifs:") {
 	lb.protocol.register("file:", lb.protocol.get("taurifs:" as "file:")!)
 }
 
@@ -437,12 +468,14 @@ if (native.protocol == "taurifs:") {
 	const {TextEditor} = await import(
 		"../stdlib/views/text-editor/text-editor.ts"
 	)
-	DockviewSurfaceLayer.use()
+	await DockviewSurfaceLayer.use()
 	TextEditor.use()
-	await lb.open(native.systemDirectory.toString().concat("core/entrypoint.ts"))
-	const file = await native.read(
-		native.systemDirectory.toString().concat("stdlib/test.ts")
+	console.log("hello world")
+	await lb.open(
+		nativefs.systemDirectory.toString().concat("core/entrypoint.ts")
 	)
+	const userScript = "/littlebook:user/init.ts"
+	import(userScript)
 })()
 
 declare global {

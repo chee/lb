@@ -1,16 +1,10 @@
-import type {
-	LbResourceHandle,
-	LbHandleForProtocol,
-	LbHandlemap as LbHandleMap,
-} from "./handle.ts"
+import type {LbHandle, LbHandleForProtocol, LbHandleMap} from "./handle.ts"
 
-export type Protocol = keyof LbHandleMap
+export type Protocol = keyof LbHandleMap | `${string}:`
 
 export type ProtocolHandler<P extends string> = (
 	url: `${P}:${string}` | (URL & {protocol: P})
-) => Promise<
-	P extends keyof LbHandleMap ? LbHandleForProtocol<P> : LbResourceHandle
->
+) => Promise<P extends keyof LbHandleMap ? LbHandleForProtocol<P> : LbHandle>
 
 export function createProtocolHandlerRegistry() {
 	const handlers: Record<string, ProtocolHandler<any>> = {}

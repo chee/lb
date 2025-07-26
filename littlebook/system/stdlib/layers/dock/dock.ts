@@ -1,19 +1,19 @@
-import type {LbResourceHandle, LbSurfaceLayer} from "littlebook"
-import "./dock.css"
-import * as Dockview from "dockview-core/dist/dockview-core.esm.js"
+import type {LbHandle, LbSurfaceLayer} from "littlebook"
+import * as Dockview from "dockview-core"
 const log = littlebook.log.extend("dock-surface-manager")
 declare module "littlebook" {
-	interface LbSurface<H extends LbResourceHandle = LbResourceHandle> {
-		_dockAPI?: Dockview.DockviewPanelApi
+	interface LbSurface<H extends LbHandle = LbHandle> {
+		_dockAPI?: Dockview.DockviewPanel["api"]
 	}
 }
 
-// todo maybe make these take a ref to littlebook instead of the global
 export class DockviewSurfaceLayer
-	implements LbSurfaceLayer<Dockview.SerializedDockview>
+	implements LbSurfaceLayer<Dockview.DockviewApi["toJSON"]>
 {
 	static name = "dock"
-	static use() {
+	static async use() {
+		await lb.style("https://esm.sh/dockview-core/dist/styles/dockview.css")
+		await lb.style(import.meta.resolve("./dock.css"))
 		lb.registerLayer(
 			DockviewSurfaceLayer.name,
 			element => new DockviewSurfaceLayer(element)
@@ -23,7 +23,7 @@ export class DockviewSurfaceLayer
 	element: HTMLElement
 	constructor(element: HTMLElement) {
 		this._dockview = Dockview.createDockview(element, {
-			createComponent(component) {
+			createComponent(component: {id: string}) {
 				const parent = document.createElement("little-surface")
 				parent.style.display = "contents"
 				parent.dataset.surface = component.id
@@ -66,7 +66,7 @@ export class DockviewSurfaceLayer
 		this._dockview.getPanel(id)?.focus()
 	}
 
-	restore(json: Dockview.SerializedDockview) {
+	restore(json: Dockview.DockviewApi["toJSON"]) {
 		this._dockview.fromJSON(json)
 	}
 }

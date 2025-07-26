@@ -4,13 +4,10 @@ import chokidar from "chokidar"
 import {VFSPackager} from "./vfs.js"
 
 const ctx = await context({
-	banner: {
-		js: /*js*/ `;if ("window" in self && !window.esbuildListening) {
-			new EventSource('/esbuild').addEventListener('change', () => location.reload())
-			window.esbuildListening = true
-		};`,
-	},
 	bundle: true,
+	define: {
+		"self.LITTLEBOOK_DEV": "true",
+	},
 })
 
 const vfs = new VFSPackager()
@@ -23,7 +20,7 @@ chokidar.watch(system, {ignoreInitial: true}).on("all", () => {
 	ctx.rebuild()
 })
 
-ctx.serve({port: 2025, servedir: options.outdir})
+ctx.serve({port: Number(process.env.PORT) || 2025, servedir: options.outdir})
 ctx.watch()
 
 const mach = await machineContext

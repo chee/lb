@@ -3,6 +3,9 @@ import path from "node:path"
 /** @type {import("esbuild").BuildOptions} */
 const bookstrapOptions = {
 	format: "iife",
+	define: {
+		"self.LITTLEBUILDDATE": JSON.stringify(new Date().toISOString()),
+	},
 	entryPoints: ["./bookstrap/**", "./install/**"],
 	outdir: "./dist",
 	loader: {".html": "copy", ".txt": "copy", ".wasm": "copy"},
@@ -22,18 +25,22 @@ const bookstrapOptions = {
 					})
 
 					for (const file of files) {
-						const fullPath = path.join(originalOutdir, file)
-						const stat = await fs.stat(fullPath)
-						if (stat.isFile()) {
-							const pathParts = file.split(path.sep)
-							if (pathParts.length > 1) {
-								pathParts.splice(0, 1)
-								const newPath = path.join(originalOutdir, ...pathParts)
-								await fs.mkdir(path.dirname(newPath), {
-									recursive: true,
-								})
-								await fs.rename(fullPath, newPath)
+						try {
+							const fullPath = path.join(originalOutdir, file)
+							const stat = await fs.stat(fullPath)
+							if (stat.isFile()) {
+								const pathParts = file.split(path.sep)
+								if (pathParts.length > 1) {
+									pathParts.splice(0, 1)
+									const newPath = path.join(originalOutdir, ...pathParts)
+									await fs.mkdir(path.dirname(newPath), {
+										recursive: true,
+									})
+									await fs.rename(fullPath, newPath)
+								}
 							}
+						} catch (error) {
+							console.error(`Error processing file ${file}:`, error)
 						}
 					}
 				})

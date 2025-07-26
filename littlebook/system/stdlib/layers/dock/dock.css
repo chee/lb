@@ -1,5 +1,3 @@
-@import url("https://esm.sh/dockview-core/dist/styles/dockview.css");
-
 :root,
 [theme] {
 	--dock-fill: var(--workspace-fill);

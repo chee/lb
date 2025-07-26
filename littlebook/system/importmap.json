@@ -2,9 +2,15 @@
 	"imports": {
 		"littlebook": "./entrypoint.ts",
 		"dockview-core": "https://esm.sh/dockview-core",
-		"dockview-core/": "https://esm.sh/dockview-core/",
+
+		"crelt": "https://esm.sh/crelt",
 		"@codemirror/language": "https://esm.sh/@codemirror/language",
 		"@lezer/highlight": "https://esm.sh/@lezer/highlight",
+		"@lezer/javascript": "https://esm.sh/@lezer/javascript",
+		"@lezer/lr": "https://esm.sh/@lezer/lr",
+		"@lezer/common": "https://esm.sh/@lezer/common",
+		"@marijn/find-cluster-break": "https://esm.sh/@marijn/find-cluster-break",
+
 		"@codemirror/lsp-client": "https://esm.sh/@codemirror/lsp-client",
 		"@codemirror/autocomplete": "https://esm.sh/@codemirror/autocomplete",
 		"@codemirror/commands": "https://esm.sh/@codemirror/commands",
@@ -16,6 +22,9 @@
 		"@codemirror/state": "https://esm.sh/@codemirror/state",
 		"@codemirror/view": "https://esm.sh/@codemirror/view",
 		"@codemirror/search": "https://esm.sh/@codemirror/search",
+		"style-mod": "https://esm.sh/style-mod",
+		"w3c-keyname": "https://esm.sh/w3c-keyname",
+
 		"@xterm/addon-canvas": "https://esm.sh/@xterm/addon-canvas",
 		"@xterm/addon-clipboard": "https://esm.sh/@xterm/addon-clipboard",
 		"@xterm/addon-fit": "https://esm.sh/@xterm/addon-fit",
@@ -25,30 +34,16 @@
 		"@xterm/addon-serialize": "https://esm.sh/@xterm/addon-serialize",
 		"@xterm/addon-web-links": "https://esm.sh/@xterm/addon-web-links",
 		"@xterm/xterm": "https://esm.sh/@xterm/xterm",
-		"@tauri-apps/api": "https://esm.sh/@tauri-apps/api",
-		"@tauri-apps/cli": "https://esm.sh/@tauri-apps/cli",
-		"@tauri-apps/plugin-cli": "https://esm.sh/@tauri-apps/plugin-cli",
-		"@tauri-apps/plugin-dialog": "https://esm.sh/@tauri-apps/plugin-dialog",
-		"@tauri-apps/plugin-fs": "https://esm.sh/@tauri-apps/plugin-fs",
-		"@tauri-apps/plugin-global-shortcut": "https://esm.sh/@tauri-apps/plugin-global-shortcut",
-		"@tauri-apps/plugin-notification": "https://esm.sh/@tauri-apps/plugin-notification",
-		"@tauri-apps/plugin-opener": "https://esm.sh/@tauri-apps/plugin-opener",
-		"@tauri-apps/plugin-shell": "https://esm.sh/@tauri-apps/plugin-shell",
-		"@tauri-apps/plugin-store": "https://esm.sh/@tauri-apps/plugin-store",
-		"@tauri-apps/plugin-stronghold": "https://esm.sh/@tauri-apps/plugin-stronghold",
-		"@tauri-apps/plugin-websocket": "https://esm.sh/@tauri-apps/plugin-websocket",
-		"@tauri-apps/plugin-window-state": "https://esm.sh/@tauri-apps/plugin-window-state",
 		"@valtown/codemirror-ts": "https://esm.sh/@valtown/codemirror-ts",
 		"esbuild-wasm": "https://esm.sh/esbuild-wasm",
 		"eventemitter3": "https://esm.sh/eventemitter3",
 		"hotkeys-js": "https://esm.sh/hotkeys-js",
 		"node-types": "https://esm.sh/@types/node",
 		"rspack": "https://esm.sh/rspack",
-		"style-mod": "https://esm.sh/style-mod",
+
 		"tauri-pty": "https://esm.sh/tauri-pty",
 		"vscode-langservers-extracted": "https://esm.sh/vscode-langservers-extracted",
 		"tldraw": "https://esm.sh/tldraw",
-		"@automerge/automerge-codemirror": "https://esm.sh/@automerge/automerge-codemirror",
-		"@tauri-apps/plugin-cache-api": "https://esm.sh/tauri-plugin-cache-api"
+		"@automerge/automerge-codemirror": "https://esm.sh/@automerge/automerge-codemirror"
 	}
 }

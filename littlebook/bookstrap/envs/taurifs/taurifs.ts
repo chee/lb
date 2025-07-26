@@ -5,11 +5,11 @@ import type {
 } from "../../bookstrap.ts"
 ;(async function () {
 	const event = new Event("__lb_env:taurifs")
-	if (!window.__TAURI__) {
-		window.dispatchEvent(event)
+	if (!self.__TAURI__) {
+		self.dispatchEvent(event)
 		return
 	}
-	const tauri = window.__TAURI__
+	const tauri = self.__TAURI__
 
 	function fixurl(url: string | URL) {
 		if (typeof url === "string") {
@@ -123,7 +123,7 @@ import type {
 		},
 	} satisfies LbEnvironment
 
-	window.__lb_env = window.__lb_env || {}
-	window.__lb_env.taurifs = host
-	window.dispatchEvent(event)
+	self.__lb_env = self.__lb_env || {}
+	self.__lb_env.taurifs = host
+	self.dispatchEvent(event)
 })()

@@ -20,6 +20,7 @@
 		"esbuild-plugin-inline-worker": "^0.1.1",
 		"esbuild-wasm": "0.25.8",
 		"rolldown": "1.0.0-beta.28",
-		"rollup-plugin-dev": "^2.0.5"
+		"rollup-plugin-dev": "^2.0.5",
+		"service-worker-types": "npm:@types/serviceworker@^0.0.146"
 	}
 }
