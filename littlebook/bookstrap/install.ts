@@ -208,6 +208,6 @@ async function setup() {
 
 	const script = document.createElement("script")
 	script.type = "module"
-	script.src = "/bundleworker.js"
+	script.src = "/transformer.js"
 	document.head.append(script)
 }

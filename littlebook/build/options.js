@@ -9,7 +9,7 @@ const bookstrapOptions = {
 	entryPoints: [
 		"./bookstrap/**",
 		// todo remove after https://bugzilla.mozilla.org/show_bug.cgi?id=1969527
-		"./machine/serviceworker.ts",
+		"./machine/service-worker.ts",
 	],
 	outdir: "./dist",
 	loader: {".html": "copy", ".txt": "copy", ".wasm": "copy"},
