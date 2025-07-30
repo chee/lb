@@ -1,6 +1,10 @@
 /// <reference lib="webworker" />
 
-import type {LbEnvironment, LbFilesystemStat} from "../../bookstrap.ts"
+import type {
+	LbEnvironment,
+	LbFilesystemFileType,
+	LbFilesystemStat,
+} from "../../bookstrap.ts"
 
 class OPFSHost implements LbEnvironment {
 	cwd: LbEnvironment["cwd"]
@@ -25,12 +29,7 @@ class OPFSHost implements LbEnvironment {
 		this.inited = true
 	}
 
-	/**
-	 *
-	 * @param {string} path
-	 * @returns
-	 */
-	parsePath(path) {
+	parsePath(path: string | URL) {
 		const pathStr = path.toString()
 		// Remove opfs:/// prefix if present
 		const cleanPath = pathStr.replace(/^opfs:\/+/, "/").replace(/\/+/g, "/")
@@ -38,7 +37,7 @@ class OPFSHost implements LbEnvironment {
 		return cleanPath.split("/").filter(segment => segment.length > 0)
 	}
 
-	async getDirectoryHandle(pathSegments, create = false) {
+	async getDirectoryHandle(pathSegments: string[], create = false) {
 		let currentHandle = this.rootHandle
 
 		for (const segment of pathSegments) {
@@ -57,13 +56,10 @@ class OPFSHost implements LbEnvironment {
 		return currentHandle
 	}
 
-	/**
-	 *
-	 * @param {string[]} pathSegments
-	 * @param {boolean} create
-	 * @returns
-	 */
-	async getFileHandle(pathSegments, create = false) {
+	async getFileHandle(
+		pathSegments: string[],
+		{create}: {create?: boolean} = {}
+	) {
 		if (pathSegments.length === 0) {
 			throw new Error("Cannot get file handle for root directory")
 		}
@@ -83,12 +79,22 @@ class OPFSHost implements LbEnvironment {
 		}
 	}
 
-	/**
-	 *
-	 * @param {string} path
-	 * @returns
-	 */
-	async read(path) {
+	async rm(path: string) {
+		const pathSegments = this.parsePath(path)
+		const dirHandle = await this.getDirectoryHandle(pathSegments.slice(0, -1))
+		const fileName = pathSegments[pathSegments.length - 1]
+
+		try {
+			await dirHandle.removeEntry(fileName)
+		} catch (error) {
+			if (error.name === "NotFoundError") {
+				throw new Error(`File not found: ${pathSegments.join("/")}`)
+			}
+			throw error
+		}
+	}
+
+	async read(path: string) {
 		const pathSegments = this.parsePath(path)
 		const fileHandle = await this.getFileHandle(pathSegments)
 		const file = await fileHandle.getFile()
@@ -98,14 +104,9 @@ class OPFSHost implements LbEnvironment {
 
 	open = new Set<FileSystemFileHandle>()
 
-	/**
-	 *
-	 * @param {string} path
-	 * @param {Uint8Array} bytes
-	 */
-	async write(path, bytes) {
+	async write(path: string, bytes: Uint8Array) {
 		const pathSegments = this.parsePath(path)
-		const fileHandle = await this.getFileHandle(pathSegments, true)
+		const fileHandle = await this.getFileHandle(pathSegments, {create: true})
 		if (this.open.has(fileHandle)) {
 			console.warn(`File already open: ${path}`)
 		}
@@ -127,16 +128,12 @@ class OPFSHost implements LbEnvironment {
 		})
 	}
 
-	/**
-	 * @param {string} path
-	 */
-	async list(path) {
+	async list(path: string) {
 		const pathSegments = this.parsePath(path)
 		const dirHandle = await this.getDirectoryHandle(pathSegments)
 
 		const entries = []
 		for await (const [name, handle] of dirHandle.entries()) {
-			/** @type {LittlebookFilesystemFileType} */
 			const type = handle.kind === "file" ? "file" : "directory"
 			entries.push({name, type})
 		}
@@ -144,12 +141,7 @@ class OPFSHost implements LbEnvironment {
 		return entries
 	}
 
-	/**
-	 *
-	 * @param {string} path
-	 * @returns
-	 */
-	async stat(path) {
+	async stat(path: string) {
 		const pathSegments = this.parsePath(path)
 
 		try {
@@ -158,8 +150,8 @@ class OPFSHost implements LbEnvironment {
 			return {
 				size: file.size,
 				modified: new Date(file.lastModified),
-				/** @type {LittlebookFilesystemFileType} */
-				type: "file",
+
+				type: "file" as LbFilesystemFileType,
 				readonly: false,
 			} satisfies LbFilesystemStat
 		} catch (error) {
@@ -168,8 +160,7 @@ class OPFSHost implements LbEnvironment {
 				return {
 					size: 0,
 					modified: null,
-					/** @type {LittlebookFilesystemFileType} */
-					type: "directory",
+					type: "directory" as LbFilesystemFileType,
 					readonly: false,
 				}
 			} catch (dirError) {
@@ -178,11 +169,10 @@ class OPFSHost implements LbEnvironment {
 		}
 	}
 
-	async mkdir(path, options = {}) {
+	async mkdir(path: string, options: {parents?: boolean} = {}) {
 		const pathSegments = this.parsePath(path)
 
 		if (options.parents) {
-			// Create all parent directories
 			await this.getDirectoryHandle(pathSegments, true)
 		} else {
 			if (pathSegments.length === 0) {
@@ -229,7 +219,7 @@ self.onmessage = async function (e) {
 		 * @param {any} result
 		 * @param {ArrayBuffer[]} transfer
 		 */
-		function send(result, transfer = []) {
+		function send(result: any, transfer: ArrayBuffer[] = []) {
 			self.postMessage({id, result}, {transfer})
 		}
 
@@ -268,7 +258,7 @@ self.onmessage = async function (e) {
 				send("Uninstallation complete")
 				break
 			case "rm":
-				console.debug("not implemented.")
+				send(await host.rm(args[0]))
 				break
 			default:
 				throw new Error(`unknown method: ${method}`)
@@ -283,7 +273,7 @@ self.onmessage = async function (e) {
  * @param {object} vfs
  * @param {string} targetPath
  */
-async function materializeVFS(vfs, targetPath) {
+async function materializeVFS(vfs: object, targetPath: string) {
 	try {
 		//console.debug(`Materializing Littlebook VFS to ${targetPath}`)
 		await host.mkdir(targetPath, {parents: true})
@@ -312,7 +302,7 @@ async function materializeVFS(vfs, targetPath) {
  * @param {URL|string} url
  * @param {string} targetPath
  */
-async function downloadAndMaterialize(url, targetPath) {
+async function downloadAndMaterialize(url: URL | string, targetPath: string) {
 	try {
 		//console.debug(`Downloading VFS from ${url}?`)
 		const vfs = await (await fetch(url)).json()

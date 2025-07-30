@@ -1,8 +1,8 @@
 {
 	"imports": {
-		"littlebook": "./entrypoint.ts",
+		"littlebook": "/littlebook:system/littlebook.ts",
 		"dockview-core": "https://esm.sh/dockview-core",
-
+		"dockview-core/": "https://esm.sh/dockview-core/",
 		"crelt": "https://esm.sh/crelt",
 		"@codemirror/language": "https://esm.sh/@codemirror/language",
 		"@lezer/highlight": "https://esm.sh/@lezer/highlight",
@@ -34,16 +34,21 @@
 		"@xterm/addon-serialize": "https://esm.sh/@xterm/addon-serialize",
 		"@xterm/addon-web-links": "https://esm.sh/@xterm/addon-web-links",
 		"@xterm/xterm": "https://esm.sh/@xterm/xterm",
-		"@valtown/codemirror-ts": "https://esm.sh/@valtown/codemirror-ts",
-		"esbuild-wasm": "https://esm.sh/esbuild-wasm",
 		"eventemitter3": "https://esm.sh/eventemitter3",
 		"hotkeys-js": "https://esm.sh/hotkeys-js",
 		"node-types": "https://esm.sh/@types/node",
 		"rspack": "https://esm.sh/rspack",
 
+		"esbuild-wasm": "https://esm.sh/esbuild-wasm",
 		"tauri-pty": "https://esm.sh/tauri-pty",
 		"vscode-langservers-extracted": "https://esm.sh/vscode-langservers-extracted",
 		"tldraw": "https://esm.sh/tldraw",
-		"@automerge/automerge-codemirror": "https://esm.sh/@automerge/automerge-codemirror"
+		"@automerge/automerge-codemirror": "https://esm.sh/@automerge/automerge-codemirror",
+		"typescript": "https://esm.sh/typescript",
+		"@typescript/": "https://esm.sh/@typescript/",
+		"lz-string": "https://esm.sh/lz-string",
+		"comlink": "https://esm.sh/comlink",
+		"@valtown/codemirror-ts": "https://esm.sh/@valtown/codemirror-ts@3.0.0-14",
+		"@valtown/codemirror-ts/": "https://esm.sh/@valtown/codemirror-ts@3.0.0-14/"
 	}
 }

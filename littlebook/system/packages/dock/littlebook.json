@@ -1,0 +1,9 @@
+{
+	"name": "@littlebook/dock",
+	"version": "0.0.0",
+	"imports": {
+		"dockview-core": "https://esm.sh/dockview-core",
+		"dockview-core/": "https://esm.sh/dockview-core/"
+	},
+	"entry": "./dock.ts"
+}

@@ -1,0 +1,775 @@
+:root,
+[theme] {
+	--default-tab-size: 2;
+	--workspace-fill: white;
+	--workspace-fill-offset-10: color-mix(
+		in oklch,
+		var(--workspace-fill),
+		var(--workspace-line) 10%
+	);
+	--workspace-fill-offset-20: color-mix(
+		in oklch,
+		var(--workspace-fill),
+		var(--workspace-line) 20%
+	);
+	--workspace-fill-offset-30: color-mix(
+		in oklch,
+		var(--workspace-fill),
+		var(--workspace-line) 30%
+	);
+	--workspace-fill-offset-40: color-mix(
+		in oklch,
+		var(--workspace-fill),
+		var(--workspace-line) 40%
+	);
+	--workspace-fill-offset-50: color-mix(
+		in oklch,
+		var(--workspace-fill),
+		var(--workspace-line) 50%
+	);
+	--workspace-line: black;
+	--workspace-line-offset-10: color-mix(
+		in oklch,
+		var(--workspace-line),
+		var(--workspace-fill) 10%
+	);
+	--workspace-line-offset-20: color-mix(
+		in oklch,
+		var(--workspace-line),
+		var(--workspace-fill) 20%
+	);
+	--workspace-line-offset-30: color-mix(
+		in oklch,
+		var(--workspace-line),
+		var(--workspace-fill) 30%
+	);
+	--workspace-line-offset-40: color-mix(
+		in oklch,
+		var(--workspace-line),
+		var(--workspace-fill) 40%
+	);
+	--workspace-line-offset-50: color-mix(
+		in oklch,
+		var(--workspace-line),
+		var(--workspace-fill) 50%
+	);
+
+	--workspace-primary: #35f7ca;
+	--workspace-added: #35f7ca;
+	--workspace-deleted: #ff6a90;
+	--workspace-modified: #f8c43b;
+	--workspace-secondary: #33ccf8;
+	--workspace-link: #36e;
+	--workspace-danger: #ff6a90;
+	--workspace-warning: #f8c43b;
+	--workspace-family-sans: "Jost*", "Jost", system-ui, -apple-system, sans-serif;
+	--workspace-family-code: "Fantasque Sans Mono", "IBM Plex Mono", "Fira Code",
+		"Iosevka", ui-monospace, monospace;
+	--workspace-font-size: 16px;
+	--workspace-font-weight: 400;
+	--workspace-selection-fill: #ffee8888;
+	--workspace-selection-line: var(--workspace-line);
+	--workspace-line-height: 1.5;
+
+	--editor-line: var(--workspace-line);
+	--editor-fill: var(--workspace-fill);
+	--editor-fill-offset-10: color-mix(
+		in oklch,
+		var(--editor-fill),
+		var(--editor-line) 10%
+	);
+	--editor-fill-offset-20: color-mix(
+		in oklch,
+		var(--editor-fill),
+		var(--editor-line) 20%
+	);
+	--editor-fill-offset-30: color-mix(
+		in oklch,
+		var(--editor-fill),
+		var(--editor-line) 30%
+	);
+	--editor-fill-offset-40: color-mix(
+		in oklch,
+		var(--editor-fill),
+		var(--editor-line) 40%
+	);
+	--editor-fill-offset-50: color-mix(
+		in oklch,
+		var(--editor-fill),
+		var(--editor-line) 50%
+	);
+	--editor-line: black;
+	--editor-line-offset-10: color-mix(
+		in oklch,
+		var(--editor-line),
+		var(--editor-fill) 10%
+	);
+	--editor-line-offset-20: color-mix(
+		in oklch,
+		var(--editor-line),
+		var(--editor-fill) 20%
+	);
+	--editor-line-offset-30: color-mix(
+		in oklch,
+		var(--editor-line),
+		var(--editor-fill) 30%
+	);
+	--editor-line-offset-40: color-mix(
+		in oklch,
+		var(--editor-line),
+		var(--editor-fill) 40%
+	);
+	--editor-line-offset-50: color-mix(
+		in oklch,
+		var(--editor-line),
+		var(--editor-fill) 50%
+	);
+
+	--editor-family-code: var(--workspace-family-code);
+	--editor-family-sans: var(--workspace-family-sans);
+	--editor-font-size: var(--workspace-font-size);
+	--editor-font-weight: var(--editor-font-weight);
+	--editor-selection-fill: var(--workspace-selection-fill);
+	--editor-selection-line: var(--workspace-selection-line);
+	--editor-line-height: var(--workspace-line-height);
+	--editor-cursor-fill: var(--editor-line);
+	--text-editor-fill: var(--editor-fill);
+	--text-editor-fill-offset-10: var(--editor-fill-offset-10);
+	--text-editor-fill-offset-20: var(--editor-fill-offset-20);
+	--text-editor-fill-offset-30: var(--editor-fill-offset-30);
+	--text-editor-fill-offset-40: var(--editor-fill-offset-40);
+	--text-editor-fill-offset-50: var(--editor-fill-offset-50);
+	--text-editor-fill-offset-10: color-mix(
+		in oklch,
+		var(--text-editor-fill),
+		var(--text-editor-line) 10%
+	);
+	--text-editor-fill-offset-20: color-mix(
+		in oklch,
+		var(--text-editor-fill),
+		var(--text-editor-line) 20%
+	);
+	--text-editor-fill-offset-30: color-mix(
+		in oklch,
+		var(--text-editor-fill),
+		var(--text-editor-line) 30%
+	);
+	--text-editor-fill-offset-40: color-mix(
+		in oklch,
+		var(--text-editor-fill),
+		var(--text-editor-line) 40%
+	);
+	--text-editor-fill-offset-50: color-mix(
+		in oklch,
+		var(--text-editor-fill),
+		var(--text-editor-line) 50%
+	);
+	--text-editor-line: var(--editor-line);
+	--text-editor-line-offset-10: color-mix(
+		in oklch,
+		var(--text-editor-line),
+		var(--text-editor-fill) 10%
+	);
+	--text-editor-line-offset-20: color-mix(
+		in oklch,
+		var(--text-editor-line),
+		var(--text-editor-fill) 20%
+	);
+	--text-editor-line-offset-30: color-mix(
+		in oklch,
+		var(--text-editor-line),
+		var(--text-editor-fill) 30%
+	);
+	--text-editor-line-offset-40: color-mix(
+		in oklch,
+		var(--text-editor-line),
+		var(--text-editor-fill) 40%
+	);
+	--text-editor-line-offset-50: color-mix(
+		in oklch,
+		var(--text-editor-line),
+		var(--text-editor-fill) 50%
+	);
+	--text-editor-family-code: var(--editor-family-code);
+	--text-editor-family-sans: var(--editor-family-sans);
+	--text-editor-cursor-fill: var(--editor-cursor-fill);
+	--text-editor-selection-fill: var(--editor-selection-fill);
+	--text-editor-selection-line: var(--editor-selection-line);
+	--text-editor-active-line-fill: color-mix(
+		in oklch,
+		var(--text-editor-fill-offset-10),
+		transparent 80%
+	);
+	--text-editor-active-line-line: var(--text-editor-line);
+	--text-editor-active-line-fill--gutter: var(--text-editor-fill-offset-20);
+	--text-editor-active-line-line--gutter: var(--text-editor-line);
+	--text-editor-gutter-fill: var(--text-editor-fill-offset-30);
+	--text-editor-gutter-line: var(--text-editor-line);
+	--text-editor-gutter-border: var(--text-editor-fill-offset-40);
+	--text-editor-gutter-font-size: var(--editor-font-size);
+	--text-editor-gutter-fill--line-numbers: var(--text-editor-gutter-fill);
+	--text-editor-gutter-line--line-numbers: var(--text-editor-gutter-line);
+	--text-editor-gutter-font-size--line-numbers: var(--editor-font-size);
+	--text-editor-tooltip-fill: var(--text-editor-fill-offset-20);
+	--text-editor-tooltip-color: var(--text-editor-line);
+	--text-editor-line-height: var(--editor-line-height);
+	--text-editor-text-style: normal;
+	--text-editor-text-weight: normal;
+	--text-editor-text-fill: transparent;
+
+	--syntax-comment: var(--text-editor-line-offset-50);
+	--syntax-style-comment: italic;
+	--syntax-fill-comment: var(--text-editor-text-fill);
+	--syntax-weight-comment: var(--text-editor-text-weight);
+
+	--syntax-line-comment: var(--syntax-comment);
+	--syntax-style-line-comment: var(--syntax-style-line-comment);
+	--syntax-fill-line-comment: var(--syntax-fill-comment);
+	--syntax-weight-line-comment: var(--syntax-weight-comment);
+
+	--syntax-block-comment: var(--syntax-comment);
+	--syntax-style-block-comment: var(--syntax-style-comment);
+	--syntax-fill-block-comment: var(--syntax-fill-comment);
+	--syntax-weight-block-comment: var(--syntax-weight-comment);
+
+	--syntax-doc-comment: var(--syntax-comment);
+	--syntax-style-doc-comment: var(--syntax-style-comment);
+	--syntax-fill-doc-comment: var(--syntax-fill-comment);
+	--syntax-weight-doc-comment: var(--syntax-weight-comment);
+
+	--syntax-meta: var(--text-editor-line);
+	--syntax-style-meta: var(--text-editor-text-style);
+	--syntax-fill-meta: var(--text-editor-text-fill);
+	--syntax-weight-meta: var(--text-editor-text-weight);
+
+	--syntax-invalid: var(--workspace-danger);
+	--syntax-style-invalid: var(--text-editor-text-style);
+	--syntax-fill-invalid: var(--text-editor-text-fill);
+	--syntax-weight-invalid: var(--text-editor-text-weight);
+
+	--syntax-operator: var(--text-editor-line);
+	--syntax-style-operator: var(--text-editor-text-style);
+	--syntax-fill-operator: var(--text-editor-text-fill);
+	--syntax-weight-operator: var(--text-editor-text-weight);
+
+	--syntax-punctuation: var(--text-editor-line);
+	--syntax-style-punctuation: var(--text-editor-text-style);
+	--syntax-fill-punctuation: var(--text-editor-text-fill);
+	--syntax-weight-punctuation: var(--text-editor-text-weight);
+
+	--syntax-bool: var(--text-editor-line);
+	--syntax-style-bool: var(--text-editor-text-style);
+	--syntax-fill-bool: var(--text-editor-text-fill);
+	--syntax-weight-bool: var(--text-editor-text-weight);
+
+	--syntax-atom: var(--text-editor-line);
+	--syntax-style-atom: var(--text-editor-text-style);
+	--syntax-fill-atom: var(--text-editor-text-fill);
+	--syntax-weight-atom: var(--text-editor-text-weight);
+
+	--syntax-keyword: var(--text-editor-line);
+	--syntax-style-keyword: var(--text-editor-text-style);
+	--syntax-fill-keyword: var(--text-editor-text-fill);
+	--syntax-weight-keyword: var(--text-editor-text-weight);
+
+	--syntax-control-keyword: var(--syntax-keyword);
+	--syntax-style-control-keyword: var(--syntax-style-keyword);
+	--syntax-fill-control-keyword: var(--syntax-fill-keyword);
+	--syntax-weight-control-keyword: var(--syntax-weight-keyword);
+
+	--syntax-module-keyword: var(--syntax-keyword);
+	--syntax-style-module-keyword: var(--syntax-style-keyword);
+	--syntax-fill-module-keyword: var(--syntax-fill-keyword);
+	--syntax-weight-module-keyword: var(--syntax-weight-keyword);
+
+	--syntax-type-name: var(--text-editor-line);
+	--syntax-style-type-name: var(--text-editor-text-style);
+	--syntax-fill-type-name: var(--text-editor-text-fill);
+	--syntax-weight-type-name: var(--text-editor-text-weight);
+
+	--syntax-class-name: var(--text-editor-line);
+	--syntax-style-class-name: var(--text-editor-text-style);
+	--syntax-fill-class-name: var(--text-editor-text-fill);
+	--syntax-weight-class-name: var(--text-editor-text-weight);
+
+	--syntax-type-operator: var(--syntax-operator);
+	--syntax-style-type-operator: var(--syntax-style-operator);
+	--syntax-fill-type-operator: var(--syntax-fill-operator);
+	--syntax-weight-type-operator: var(--syntax-weight-operator);
+
+	--syntax-variable-name: var(--text-editor-line);
+	--syntax-style-variable-name: var(--text-editor-text-style);
+	--syntax-fill-variable-name: var(--text-editor-text-fill);
+	--syntax-weight-variable-name: var(--text-editor-text-weight);
+
+	--syntax-special--variable-name: var(--syntax-variable-name);
+	--syntax-style-special--variable-name: var(--syntax-style-variable-name);
+	--syntax-fill-special--variable-name: var(--syntax-fill-variable-name);
+	--syntax-weight-special--variable-name: var(--syntax-weight-variable-name);
+
+	--syntax-function--variable-name: var(--syntax-variable-name);
+	--syntax-style-function--variable-name: var(--syntax-style-variable-name);
+	--syntax-fill-function--variable-name: var(--syntax-fill-variable-name);
+	--syntax-weight-function--variable-name: var(--syntax-weight-variable-name);
+
+	--syntax-definition--variable-name: var(--syntax-variable-name);
+	--syntax-style-definition--variable-name: var(--syntax-style-variable-name);
+	--syntax-fill-definition--variable-name: var(--syntax-fill-variable-name);
+	--syntax-weight-definition--variable-name: var(--syntax-weight-variable-name);
+
+	--syntax-function--property-name: var(--syntax-variable-name);
+	--syntax-style-function--property-name: var(--syntax-style-variable-name);
+	--syntax-fill-function--property-name: var(--syntax-fill-variable-name);
+	--syntax-weight-function--property-name: var(--syntax-weight-variable-name);
+
+	--syntax-string: var(--text-editor-line);
+	--syntax-fill-string: var(--text-editor-text-style);
+	--syntax-style-string: var(--text-editor-text-fill);
+	--syntax-weight-string: var(--text-editor-text-weight);
+
+	--syntax-number: var(--text-editor-line);
+	--syntax-fill-number: var(--text-editor-text-style);
+	--syntax-style-number: var(--text-editor-text-fill);
+	--syntax-weight-number: var(--text-editor-text-weight);
+
+	--syntax-integer: var(--syntax-number);
+	--syntax-style-integer: var(--syntax-style-number);
+	--syntax-fill-integer: var(--syntax-fill-number);
+	--syntax-weight-integer: var(--syntax-weight-number);
+
+	--syntax-float: var(--syntax-number);
+	--syntax-style-float: var(--syntax-style-number);
+	--syntax-fill-float: var(--syntax-fill-number);
+	--syntax-weight-float: var(--syntax-weight-number);
+
+	--syntax-escape: var(--syntax-punctuation);
+	--syntax-style-escape: var(--syntax-style-punctuation);
+	--syntax-fill-escape: var(--syntax-fill-punctuation);
+	--syntax-weight-escape: var(--syntax-weight-punctuation);
+
+	--syntax-regexp: var(--syntax-string);
+	--syntax-style-regexp: var(--syntax-style-string);
+	--syntax-fill-regexp: var(--syntax-fill-string);
+	--syntax-weight-regexp: var(--syntax-weight-string);
+
+	--syntax-special--string: var(--syntax-string);
+	--syntax-style-special--string: var(--syntax-style-string);
+	--syntax-fill-special--string: var(--syntax-fill-string);
+	--syntax-weight-special--string: var(--syntax-weight-string);
+
+	--syntax-tag-name: var(--text-editor-line);
+	--syntax-fill-tag-name: var(--text-editor-text-style);
+	--syntax-style-tag-name: var(--text-editor-text-fill);
+	--syntax-weight-tag-name: var(--text-editor-text-weight);
+
+	--syntax-angle-bracket: var(--syntax-punctuation);
+	--syntax-style-angle-bracket: var(--syntax-style-punctuation);
+	--syntax-fill-angle-bracket: var(--syntax-fill-punctuation);
+	--syntax-weight-angle-bracket: var(--syntax-weight-punctuation);
+
+	--syntax-attribute-name: var(--text-editor-line);
+	--syntax-fill-attribute-name: var(--text-editor-text-style);
+	--syntax-style-attribute-name: var(--text-editor-text-fill);
+	--syntax-weight-attribute-name: var(--text-editor-text-weight);
+
+	--syntax-namespace: var(--text-editor-line);
+	--syntax-fill-namespace: var(--text-editor-text-style);
+	--syntax-style-namespace: var(--text-editor-text-fill);
+	--syntax-weight-namespace: var(--text-editor-text-weight);
+
+	--syntax-strong: var(--text-editor-line);
+	--syntax-fill-strong: var(--text-editor-text-style);
+	--syntax-style-strong: var(--text-editor-text-fill);
+	--syntax-weight-strong: bold;
+
+	--syntax-strong: var(--text-editor-line);
+	--syntax-fill-strong: var(--text-editor-text-style);
+	--syntax-style-strong: italic;
+	--syntax-weight-strong: var(--text-editor-text-weight);
+
+	--syntax-heading: var(--text-editor-line);
+	--syntax-fill-heading: var(--text-editor-text-style);
+	--syntax-style-heading: var(--text-editor-text-fill);
+	--syntax-weight-heading: bold;
+
+	--syntax-link: var(--workspace-link);
+	--syntax-fill-link: var(--text-editor-text-style);
+	--syntax-style-link: var(--text-editor-text-fill);
+	--syntax-weight-link: var(--text-editor-text-weight);
+
+	--syntax-quote: var(--syntax-punctuation);
+	--syntax-style-quote: var(--syntax-style-punctuation);
+	--syntax-fill-quote: var(--syntax-fill-punctuation);
+	--syntax-weight-quote: var(--syntax-weight-punctuation);
+
+	--syntax-list: var(--text-editor-line);
+	--syntax-fill-list: var(--text-editor-text-style);
+	--syntax-style-list: var(--text-editor-text-fill);
+	--syntax-weight-list: var(--text-editor-text-weight);
+
+	--syntax-inserted: var(--workspace-added);
+	--syntax-fill-list: var(--text-editor-text-style);
+	--syntax-style-list: var(--text-editor-text-fill);
+	--syntax-weight-list: var(--text-editor-text-weight);
+
+	--syntax-deleted: var(--workspace-deleted);
+	--syntax-fill-list: var(--text-editor-text-style);
+	--syntax-style-list: var(--text-editor-text-fill);
+	--syntax-weight-list: var(--text-editor-text-weight);
+
+	--syntax-changed: var(--workspace-modified);
+	--syntax-fill-list: var(--text-editor-text-style);
+	--syntax-style-list: var(--text-editor-text-fill);
+	--syntax-weight-list: var(--text-editor-text-weight);
+
+	--syntax-content-separator: var(--text-editor-line);
+	--syntax-fill-content-separator: var(--text-editor-text-style);
+	--syntax-style-content-separator: var(--text-editor-text-fill);
+	--syntax-weight-content-separator: var(--text-editor-text-weight);
+}
+
+[theme="lychee"] {
+	--workspace-fill: #f9fcff;
+	--text-editor-fill: #ffffff;
+	--text-editor-line: #000000;
+	--text-editor-cursor-fill: #ee046f;
+	--text-editor-selection-fill: #e3f6ff;
+	--text-editor-selection-line: #000000;
+
+	--text-editor-active-line-fill: #086f8a05;
+	--text-editor-active-line-line: var(--text-editor-line);
+	--text-editor-active-line-fill--gutter: #e3f6ff;
+	--text-editor-active-line-line--gutter: var(--text-editor-line);
+	--text-editor-gutter-fill: #f9fcff;
+	--text-editor-gutter-line: #086f8a;
+	--text-editor-gutter-border: none;
+	--text-editor-gutter-font-size: 0.8em;
+	--text-editor-gutter-font-size--line-numbers: 0.8em;
+	--text-editor-tooltip-fill: #f9fcff;
+	--text-editor-tooltip-color: #086f8a;
+
+	--text-editor-font-size: 1em;
+	--text-editor-line-height: 1.5;
+	--text-editor-family-code: monospace;
+	--text-editor-family-sans: system-ui;
+
+	--text-editor-text-style: normal;
+	--text-editor-text-weight: normal;
+	--text-editor-text-fill: transparent;
+	--syntax-comment: #67a0b3;
+	--syntax-style-comment: italic;
+
+	--syntax-doc-comment: #253240;
+	--syntax-style-doc-comment: normal;
+
+	--syntax-meta: #566b7f;
+
+	--syntax-invalid: #ff2a50;
+
+	--syntax-operator: #086f8a;
+	--syntax-punctuation: #086f8a;
+
+	--syntax-bool: #208776;
+	--syntax-weight-bool: bold;
+
+	--syntax-atom: #ee046f;
+	--syntax-weight-atom: bold;
+
+	--syntax-keyword: #810005;
+
+	--syntax-type-name: #db4e80;
+	--syntax-weight-type-name: bold;
+
+	--syntax-class-name: #db4e80;
+	--syntax-weight-class-name: bold;
+
+	--syntax-type-operator: #0cadd6;
+
+	--syntax-function--variable-name: #3999ff;
+	--syntax-function--property-name: #3999ff;
+
+	--syntax-variable-name: #ff552a;
+	--syntax-definition--variable-name: #ff552a;
+
+	--syntax-string: #208776;
+	--syntax-fill-string: #e1fcfa99;
+
+	--syntax-number: #3999ff;
+	--syntax-integer: #3999ff;
+	--syntax-float: #3999ff;
+
+	--syntax-escape: #000;
+	--syntax-regexp: #3999ff;
+	--syntax-special--string: #208776;
+
+	--syntax-tag-name: #66629f;
+	--syntax-angle-bracket: #66629f;
+
+	--syntax-attribute-name: #db4e80;
+	--syntax-style-attribute-name: italic;
+
+	--syntax-namespace: #0cadd6;
+
+	--syntax-strong: #000;
+	--syntax-weight-strong: bold;
+
+	--syntax-emphasis: #000;
+	--syntax-style-emphasis: italic;
+
+	--syntax-heading: #086f8a;
+	--syntax-weight-heading: bold;
+
+	--syntax-link: #3999ff;
+	--syntax-style-link: underline;
+
+	--syntax-quote: #253240;
+	--syntax-list: #1d2833;
+
+	--syntax-inserted: #96e8cb;
+	--syntax-deleted: #ee046f;
+	--syntax-changed: #086f8a;
+
+	--syntax-content-separator: #000;
+}
+
+[theme="dark"] {
+	--workspace-fill: #1a1b1e;
+	--workspace-line: #e0e1e4;
+
+	--workspace-primary: #35f7ca;
+	--workspace-added: #35f7ca;
+	--workspace-deleted: #ff6a90;
+	--workspace-modified: #f8c43b;
+	--workspace-secondary: #33ccf8;
+	--workspace-link: #76a9ff;
+	--workspace-danger: #ff6a90;
+	--workspace-warning: #f8c43b;
+
+	--workspace-selection-fill: #26465388;
+
+	--editor-cursor-fill: var(--workspace-primary);
+	--text-editor-line: #e0e1e4;
+
+	--text-editor-active-line-fill: color-mix(
+		in oklch,
+		var(--text-editor-fill-offset-10),
+		transparent 80%
+	);
+	--text-editor-active-line-fill--gutter: var(--text-editor-fill-offset-20);
+
+	--text-editor-gutter-fill: var(--text-editor-fill-offset-30);
+	--text-editor-gutter-line: var(--text-editor-line);
+	--text-editor-gutter-border: var(--text-editor-fill-offset-40);
+	--text-editor-gutter-fill--line-numbers: var(--text-editor-fill-offset-50);
+	--text-editor-gutter-line--line-numbers: var(--text-editor-line);
+
+	--text-editor-tooltip-fill: var(--text-editor-fill-offset-20);
+	--text-editor-tooltip-color: var(--text-editor-line);
+	--syntax-comment: #6272a4;
+	--syntax-style-comment: italic;
+
+	--syntax-doc-comment: #6272a4;
+
+	--syntax-meta: #ffb86c;
+	--syntax-invalid: #ff5555;
+
+	--syntax-operator: #ff79c6;
+	--syntax-punctuation: #f8f8f2;
+
+	--syntax-bool: #bd93f9;
+	--syntax-weight-bool: bold;
+
+	--syntax-atom: #bd93f9;
+	--syntax-weight-atom: bold;
+
+	--syntax-keyword: #ff79c6;
+
+	--syntax-type-name: #8be9fd;
+	--syntax-weight-type-name: bold;
+
+	--syntax-class-name: #8be9fd;
+	--syntax-weight-class-name: bold;
+
+	--syntax-type-operator: #ffb86c;
+
+	--syntax-function--variable-name: #50fa7b;
+	--syntax-function--property-name: #50fa7b;
+
+	--syntax-variable-name: #f8f8f2;
+	--syntax-definition--variable-name: #f8f8f2;
+
+	--syntax-string: #f1fa8c;
+	--syntax-fill-string: transparent;
+
+	--syntax-number: #bd93f9;
+	--syntax-integer: #bd93f9;
+	--syntax-float: #bd93f9;
+
+	--syntax-escape: #ff79c6;
+	--syntax-regexp: #ffb86c;
+	--syntax-special--string: #f1fa8c;
+
+	--syntax-tag-name: #ff79c6;
+	--syntax-angle-bracket: #f8f8f2;
+
+	--syntax-attribute-name: #8be9fd;
+	--syntax-style-attribute-name: italic;
+
+	--syntax-namespace: #ffb86c;
+
+	--syntax-strong: #f8f8f2;
+	--syntax-weight-strong: bold;
+
+	--syntax-heading: #bd93f9;
+	--syntax-weight-heading: bold;
+
+	--syntax-link: #8be9fd;
+	--syntax-style-link: underline;
+
+	--syntax-quote: #6272a4;
+	--syntax-list: #f8f8f2;
+
+	--syntax-inserted: #50fa7b;
+	--syntax-deleted: #ff5555;
+	--syntax-changed: #f1fa8c;
+
+	--syntax-content-separator: #44475a;
+}
+
+:root {
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-text-size-adjust: 100%;
+}
+
+*,
+::before,
+::after {
+	box-sizing: inherit;
+}
+
+html {
+	box-sizing: border-box;
+	-moz-tab-size: var(--default-tab-size);
+	tab-size: var(--default-tab-size);
+	font-size: var(--workspace-font-size);
+	font-weight: var(--workspace-font-weight);
+	background: var(--workspace-fill);
+	color: var(--workspace-line);
+	font-family: var(--workspace-family-sans);
+	overscroll-behavior: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*:before,
+	*:after {
+		animation-duration: 0.001s !important;
+		transition-duration: 0.001s !important;
+		animation-iteration-count: 1 !important;
+	}
+}
+* {
+	overscroll-behavior: none;
+}
+abbr[title] {
+	text-decoration: underline dotted;
+}
+b,
+strong {
+	font-weight: bolder;
+}
+code,
+kbd,
+samp,
+pre {
+	font-family: var(--workspace-family-code);
+	font-size: 1em;
+}
+small {
+	font-size: 80%;
+}
+sub,
+sup {
+	font-size: 75%;
+	line-height: 0;
+	position: relative;
+	vertical-align: baseline;
+}
+sub {
+	bottom: -0.25em;
+}
+sup {
+	top: -0.5em;
+}
+table {
+	text-indent: 0;
+	border-color: inherit;
+}
+figure,
+button,
+input,
+optgroup,
+select,
+textarea {
+	font-family: inherit;
+	font-size: 100%;
+	margin: 0;
+}
+
+button,
+select {
+	text-transform: none;
+}
+
+img,
+video {
+	height: auto;
+	max-width: 100%;
+	image-rendering: pixelated;
+}
+
+a:active,
+a:hover {
+	outline-width: 0;
+}
+
+dialog {
+	padding: 0;
+}
+
+[hidden] {
+	display: none !important;
+}
+
+[contenteditable] {
+	outline: 0;
+}
+
+body {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+body,
+html {
+	height: 100dvh;
+	width: 100dvw;
+	overflow: hidden;
+}
+
+e-d-i-t {
+	overflow: hidden;
+	display: flex;
+	height: calc(100dvh - 2rem);
+	width: 100%;
+}
+
+e-c-h-o {
+	height: 2rem;
+	border-top: 1px solid var(--workspace-fill-offset-10);
+	width: 100%;
+}

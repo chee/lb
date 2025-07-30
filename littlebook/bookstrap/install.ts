@@ -8,7 +8,7 @@ const debug = IS_DEBUGGING
 			console,
 			"%clittlebook:install",
 			"color: #ff79c6; font-weight: bold;"
-	  )
+		)
 	: () => {}
 
 if (Object.keys(window.__lb_env).length == 0) {

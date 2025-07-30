@@ -1,11 +1,27 @@
 import esbuild, {type TransformOptions} from "esbuild-wasm"
 import {mime} from "./mimes.ts"
+import * as Comlink from "comlink"
+import type {TypescriptWorker} from "./typescript-worker.ts"
+
+const js = String.raw
+
+const typescriptWorker = Comlink.wrap<TypescriptWorker>(
+	new Worker("./typescript-worker.js", {
+		type: "module",
+	})
+)
+
+window.__lb_typescriptWorker = typescriptWorker
+declare global {
+	var __lb_typescriptWorker: typeof typescriptWorker
+}
 
 const encoder = new TextEncoder()
 navigator.serviceWorker.addEventListener("message", async event => {
 	if (event.data.type == "request") {
 		const {id, options} = event.data
 
+		// todo make this more userlandable
 		try {
 			const url = resolvePath(event.data.url)
 			const bytes = await readURL(url)
@@ -14,19 +30,33 @@ navigator.serviceWorker.addEventListener("message", async event => {
 				console.warn(`esbuild warning: ${warning.text}`)
 			})
 			let contentType = mime(url.pathname)
+			if (contentType == "application/javascript") {
+				typescriptWorker.createFile(
+					event.data.url,
+					Comlink.transfer(bytes, [bytes.buffer])
+				)
+			}
 			let code = result.code
 			if (contentType == "text/css" && options.destination == "script") {
 				contentType = "application/javascript"
-				code = /*js*/ `
-						const style = ${JSON.stringify(result.code)}
-						const existing = document.querySelector("style[data-littlebook-css='${
-							url.pathname
-						}']")
-						const element = existing ?? document.createElement("style")
-						element.dataset.littlebookCss = ${JSON.stringify(url.pathname)}
-						element.textContent = style
-						export default style
-						document.head.appendChild(element)`
+				code = js`
+					const style = ${JSON.stringify(result.code)}
+					const existing = document.querySelector("style[data-littlebook-css='${
+						url.pathname
+					}']")
+					const element = existing ?? document.createElement("style")
+					element.dataset.littlebookCss = ${JSON.stringify(url.pathname)}
+					element.textContent = style
+					export default style
+					document.head.appendChild(element)
+				`
+			}
+
+			if (
+				contentType == "application/json" &&
+				options.destination == "script"
+			) {
+				contentType = "application/javascript"
 			}
 
 			const codeBytes = encoder.encode(code)
@@ -60,15 +90,8 @@ navigator.serviceWorker.addEventListener("message", async event => {
 			})
 		}
 	}
-	/* 	if (event.data.type == "read") {
-		event.source.postMessage(
-			{type: "read", id: event.data.id, bytes},
-			{transfer: [bytes.buffer]}
-		)
-	} */
 })
 
-self.__lb_error_context = null
 function ensureTrailingSlash(path: string): string {
 	if (path.endsWith("/")) return path
 	return `${path}/`
@@ -77,16 +100,16 @@ function ensureTrailingSlash(path: string): string {
 const esbuildInitialized = Promise.withResolvers<void>()
 
 await esbuild
-	.initialize({
-		wasmURL: "/esbuild.wasm",
-		worker: false,
-	})
+	.initialize({wasmURL: "/esbuild.wasm", worker: false})
 	.then(() => esbuildInitialized.resolve())
 
 const existingSw = await navigator.serviceWorker.getRegistration()
 
 navigator.serviceWorker.addEventListener("controllerchange", function () {
-	console.log("New service worker activated, reloading")
+	console.log(
+		"%cNew service worker activated, reloading",
+		"color: pink; font-weight: bold"
+	)
 	location.reload()
 })
 
@@ -112,13 +135,11 @@ function resolvePath(path: string, base?: string | URL): URL {
 		const systemMatch = path.match(/^\/?system\/(.*)/)
 		const userMatch = path.match(/^\/?user\/(.*)/)
 		if (systemMatch) {
-			path = `${ensureTrailingSlash(nativeEnv.systemDirectory.toString())}${
-				systemMatch[1]
-			}`
+			const sys = ensureTrailingSlash(nativeEnv.systemDirectory.toString())
+			path = `${sys}${systemMatch[1]}`
 		} else if (userMatch) {
-			path = `${ensureTrailingSlash(nativeEnv.userDirectory.toString())}${
-				userMatch[1]
-			}`
+			const home = ensureTrailingSlash(nativeEnv.userDirectory.toString())
+			path = `${home}${userMatch[1]}`
 		}
 	}
 
@@ -129,18 +150,14 @@ function resolvePath(path: string, base?: string | URL): URL {
 async function readURL(url: URL) {
 	let bytes: Uint8Array
 	const protocolName = url.protocol.slice(0, -1)
-	const handler = window.lb && window.lb.protocol.get(`${protocolName}:`)
-	if (handler) {
-		const handle = await handler(url)
-		if (handle && "bytes" in handle) {
-			try {
-				bytes = await handle.bytes()
-			} catch (error) {
-				// todo return a 404, or 400, or 500
-				throw new Error(error, {
-					cause: __lb_error_context,
-				})
-			}
+
+	const source = window.__lb_protocols && window.__lb_protocols[url.protocol]
+	if (source) {
+		try {
+			const handle = await source(url)
+			return handle.bytes()
+		} catch (cause) {
+			throw new Error(cause, {cause})
 		}
 	}
 
@@ -148,11 +165,9 @@ async function readURL(url: URL) {
 		if (protocolName in __lb_env) {
 			try {
 				bytes = await __lb_env[protocolName].read(url.toString())
-			} catch (error) {
+			} catch (cause) {
 				// todo return a 404, or 400, or 500
-				throw new Error(error, {
-					cause: __lb_error_context,
-				})
+				throw new Error(cause, {cause})
 			}
 		}
 	}
@@ -163,11 +178,9 @@ async function readURL(url: URL) {
 		if (response.ok) {
 			try {
 				bytes = new Uint8Array(await response.arrayBuffer())
-			} catch (error) {
+			} catch (cause) {
 				// todo return a 404, or 400, or 500
-				throw new Error(error, {
-					cause: __lb_error_context,
-				})
+				throw new Error(cause, {cause})
 			}
 		}
 	}
@@ -176,9 +189,7 @@ async function readURL(url: URL) {
 		console.error(
 			`Failed to read file at ${url.toString()}. No handler found for protocol "${protocolName}:".`
 		)
-		throw new Error("ruh roh", {
-			cause: __lb_error_context,
-		})
+		throw new Error(`protocol handler not found for ${url}`)
 	}
 
 	return bytes
@@ -189,7 +200,8 @@ async function transform(
 	input: string | Uint8Array,
 	options?: TransformOptions
 ) {
-	const ext = url.pathname.split(".").pop() || "js"
+	const ext = url.pathname.split(".").pop()
+
 	return await esbuild.transform(input, {
 		loader: extmap[ext] || ext,
 		sourcemap: "inline",
@@ -219,9 +231,9 @@ try {
 				"font-weight: bold; color: #000;"
 			)
 
-			const entry = "/littlebook:system/entrypoint.ts"
+			const entry = "/littlebook:system/littlebook.ts"
 			performance.mark("system->start")
-			await import(entry).catch(console.error)
+			await import(entry)
 			performance.mark("system->end")
 			const systemMeasure = performance.measure(
 				"system",

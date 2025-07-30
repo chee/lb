@@ -1,5 +1,0 @@
-{
-	"imports": {
-		"@xterm/xterm": "littlebook:system/vendor/@xterm/xterm.js"
-	}
-}

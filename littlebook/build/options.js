@@ -15,6 +15,9 @@ const bookstrapOptions = {
 	loader: {".html": "copy", ".txt": "copy", ".wasm": "copy"},
 	platform: "browser",
 	logLevel: "debug",
+	logOverride: {
+		"unsupported-dynamic-import": "silent",
+	},
 	sourcemap: "both",
 	plugins: [
 		{
@@ -57,7 +60,7 @@ export default bookstrapOptions
 
 /** @type {import("esbuild").BuildOptions} */
 export const machineOptions = {
-	entryPoints: ["./machine/transformer.ts"],
+	entryPoints: ["./machine/transformer.ts", "./machine/typescript-worker.ts"],
 	outdir: `${bookstrapOptions.outdir}/machine`,
 	bundle: true,
 	platform: "browser",
@@ -65,4 +68,15 @@ export const machineOptions = {
 	splitting: true,
 	logLevel: "debug",
 	sourcemap: "both",
+
+	plugins: [
+		// {
+		// 	name: "dynamic-external",
+		// 	setup(build) {
+		// 		build.onResolve({filter: /^[^./]/}, args => {
+		// 			return {path: args.path, external: true}
+		// 		})
+		// 	},
+		// },
+	],
 }

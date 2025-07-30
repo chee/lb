@@ -77,22 +77,16 @@ self.addEventListener("fetch", async (fetchEvent: FetchEvent) => {
 					cache.put(fetchEvent.request, response.clone())
 					return response
 				} else {
-					const response = await fetch(fetchEvent.request)
-					if (response.ok) {
-						const clonedResponse = response.clone()
-						cache.put(fetchEvent.request, clonedResponse)
-						return response
-					} else {
-						return cache.match(fetchEvent.request).then(cachedResponse => {
+					return fetch(request).then(async response => {
+						if (!response.ok) {
+							const cachedResponse = await cache.match(fetchEvent.request)
 							if (cachedResponse) {
 								return cachedResponse
 							}
-							return new Response("Not found", {
-								status: 404,
-								statusText: "Not Found",
-							})
-						})
-					}
+						}
+						cache.put(fetchEvent.request, response.clone())
+						return response
+					})
 				}
 			} catch {
 				return cache.match(fetchEvent.request).then(cachedResponse => {

@@ -1,0 +1,1 @@
+think about how packages could provide an imports.json and those could be injected into importmap.scopes

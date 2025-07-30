@@ -1,0 +1,3 @@
+this provides the protocol handler terminal://
+it can open those URLs directly, doesn't need ops
+though it could maybe have json ops for the cwd etc

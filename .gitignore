@@ -1,6 +1,10 @@
+# Crush agent metadata and workspace
+.crush
+
 node_modules
 dist
 .vite
 
-# Local Netlify folder
+
 .netlify
+.aider*
