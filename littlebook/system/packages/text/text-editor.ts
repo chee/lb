@@ -1,8 +1,17 @@
 import Codemirror from "./codemirror.ts"
-import {keymap} from "@codemirror/view"
+import {EditorView, ViewPlugin, ViewUpdate} from "@codemirror/view"
 import type {Extension} from "@codemirror/state"
 import type {TextEditorLanguage} from "./languages/languages.ts"
 import {LbSet} from "../utility/set.ts"
+import {
+	log,
+	OpstreamText,
+	registerPackage,
+	SetOp,
+	Surface,
+	TextOp,
+	View,
+} from "littlebook"
 
 declare module "littlebook" {
 	export interface Vibe {
@@ -10,49 +19,93 @@ declare module "littlebook" {
 	}
 
 	export interface Packages {
-		textFileEditor: typeof textFileEditorPackage
+		text: typeof pkg
 	}
 }
 
-export function use() {
-	lb.packages.textFileEditor = textFileEditorPackage
-	lb.views.textFileView = TextFileView
-}
+const OpstreamTextPlugin = (surface: Surface<"text">) =>
+	ViewPlugin.fromClass(
+		class {
+			view: EditorView
+			cleanup: () => void
+			constructor(view: EditorView) {
+				this.view = view
+				this.cleanup = surface.opstream.connect(this.connection)
+			}
+			me = false
 
-export const TextFileView: LbViewCreator<LbFilehandle> = props => {
-	const languageName = textFileEditorPackage.languagePatterns.find(
-		([pattern]) => props.resource.url.toString().match(pattern)
-	)?.[1]
-	console.log(textFileEditorPackage.languages[languageName])
-	const language = textFileEditorPackage.languages[languageName ?? "plain"]
-	const log = lb.log.extend("text-editor")
-	log(
-		`rendering text editor for ${props.resource.url} using ${
-			language?.name ?? "plain"
-		}`
+			connection = (op: TextOp | SetOp<string>) => {
+				if (!("agent" in op) || op.agent === surface.id) return
+
+				if (!("type" in op)) {
+					this.me = true
+					this.view.dispatch({
+						changes: {
+							from: op.from,
+							to: op.to,
+							insert: op.content,
+						},
+					})
+					this.me = false
+				}
+			}
+			update(update: ViewUpdate) {
+				if (update.docChanged) {
+					for (const tr of update.transactions) {
+						if (this.me) continue
+						if (tr.changes.empty) continue
+						tr.changes.iterChanges((fromA, toA, fromB, toB, text) => {
+							surface.opstream.apply({
+								agent: surface.id,
+								from: fromB,
+								to: toA,
+								content: text.toString(),
+							})
+						})
+					}
+				}
+			}
+			destroy() {
+				this.cleanup()
+			}
+		}
 	)
 
-	// todo is this enough?
-	return async element => {
+export class TextEditor implements View<"text"> {
+	static optype = "text"
+	surface: Surface<"text">
+	languageName: string | undefined
+	language: TextEditorLanguage | undefined
+	log: typeof log
+	constructor(surface: Surface<"text">) {
+		this.surface = surface
+		this.languageName = pkg.settings.languagePatterns.find(([pattern]) =>
+			this.surface.url?.toString().match(pattern)
+		)?.[1]
+		this.language = pkg.settings.languages[this.languageName ?? "plain"]
+		this.log = log.extend("text-editor")
+	}
+	mount(element: HTMLElement) {
 		const codemirror = new Codemirror({
+			content: this.surface.opstream.value,
 			parent: element,
-			content: await props.resource.text(),
-			language: language?.(new URL(props.resource.url)),
+			language: this.language?.(new URL(this.surface.url)),
 			extensions: [
-				keymap.of([
-					{
-						stopPropagation: true,
-						key: "Meta-s",
-						preventDefault: true,
-						run() {
-							props.resource.save(codemirror.view.state.doc.toString())
-							return true
-						},
-					},
-				]),
-				props.modes
-					.filter(mode => mode.codemirrorExtension)
-					.map(mode => mode.codemirrorExtension),
+				// keymap.of([
+				// 	{
+				// 		stopPropagation: true,
+				// 		key: "Meta-s",
+				// 		preventDefault: true,
+				// 		run() {
+				// 			props.resource.save(codemirror.view.state.doc.toString())
+				// 			return true
+				// 		},
+				// 	},
+				// ]),
+				OpstreamTextPlugin(this.surface),
+				this.surface.vibes
+					.filter(vibe => vibe.codemirrorExtension)
+					.map(vibe => vibe.codemirrorExtension),
 			],
 		})
 		return () => {
@@ -61,23 +114,22 @@ export const TextFileView: LbViewCreator<LbFilehandle> = props => {
 	}
 }
 
-// todo think about this deeply
-export const textFileEditorPackage = {
-	name: "xyz.littlebook.text-files",
-	languages: {} as Record<string, TextEditorLanguage>,
-	addLanguage(name: string, language: TextEditorLanguage) {
-		this.languages[name] = language
+var pkg = registerPackage({
+	name: "text",
+	settings: {
+		languages: {} as Record<string, TextEditorLanguage>,
+		languagePatterns: new LbSet<readonly [RegExp, string]>(),
 	},
-	languagePatterns: new LbSet<readonly [RegExp, string]>(),
-	addLanguagePattern(pattern: RegExp, languageName: string) {
-		const match = [pattern, languageName] as const
-		textFileEditorPackage.languagePatterns.add(match)
-		return () => textFileEditorPackage.languagePatterns.delete(match)
-	},
-	provides: {
-		modes: {},
-		views: {TextFileView},
-		settings: {},
-		commands: {},
-	},
+	commands: {},
+	views: {TextEditor},
+})
+
+export function addLanguage(name: string, language: TextEditorLanguage) {
+	pkg.settings.languages[name] = language
+}
+
+export function addLanguagePattern(pattern: RegExp, languageName: string) {
+	const match = [pattern, languageName] as const
+	pkg.settings.languagePatterns.add(match)
+	return () => pkg.settings.languagePatterns.delete(match)
 }

@@ -8,11 +8,11 @@ import {LbSet} from "/littlebook:system/packages/utility/set.ts"
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
-type BytesOp = {agent: string; pos: number; content: number[]}
+export type BytesOp = {agent: string; pos: number; content: number[]}
 
-type TextOp = {agent: string; from: number; to: number; content?: string}
+export type TextOp = {agent: string; from: number; to: number; content?: string}
 
-type Op = TextOp | BytesOp | void
+export type Op = TextOp | BytesOp | void
 
 export interface Area<S = unknown> {
 	element: HTMLElement
@@ -56,9 +56,9 @@ export function setEnv(name: string, value: string): void {
 	events.emit(`env:${name}`, value)
 }
 
-type SetOp<T> = {type: "set"; content: T}
+export type SetOp<T> = {type: "set"; content: T}
 
-interface IOpstream<Type = any, OpType extends Op = Op> {
+export interface IOpstream<Type = any, OpType extends Op = Op> {
 	parent: IOpstream | Source | null
 	value: Type
 	connect(callback: (event: SetOp<Type> | OpType) => void): () => void
@@ -75,9 +75,9 @@ export class Opstream<Type, OpType extends Op>
 		this.value = initialValue
 		this.parent = parent
 	}
-	connect(callback: (op: OpType | SetOp<Type>) => void) {
+	connect(callback: (op: OpType) => void) {
 		this.emitter.on("op", callback)
-		callback({type: "set", content: this.value})
+		//		callback({type: "set", content: this.value})
 		return () => {
 			this.emitter.off("op", callback)
 		}
@@ -87,7 +87,7 @@ export class Opstream<Type, OpType extends Op>
 	}
 }
 
-interface IOpstreamBytes extends IOpstream<Uint8Array, BytesOp> {}
+export interface IOpstreamBytes extends IOpstream<Uint8Array, BytesOp> {}
 export class OpstreamBytes
 	extends Opstream<Uint8Array, BytesOp>
 	implements IOpstreamBytes
@@ -101,7 +101,7 @@ export class OpstreamBytes
 	}
 }
 
-interface IOpstreamText extends IOpstream<string, TextOp> {}
+export interface IOpstreamText extends IOpstream<string, TextOp> {}
 export class OpstreamText
 	extends Opstream<string, TextOp>
 	implements IOpstreamText
@@ -222,8 +222,8 @@ export async function find<T extends keyof typeof Opstreams = "bytes">(
 			throw new Error(`no protocol handler for "${url.protocol}"`)
 		}
 		source = await handler(url)
-		cachedSource.set(url.toString(), source)
-		cachedURLSources.set(url.protocol, cachedURLSources)
+		cachedURLSources.set(url.toString(), source)
+		protocolCache.set(url.protocol, cachedURLSources)
 	}
 	const cachedOpstreams = opstreamCache.get(source)
 	let opstreams = cachedOpstreams
@@ -273,54 +273,77 @@ export interface Vibe {
 	//keybindings: Record<string, string>
 }
 
-export interface Surface<T extends keyof Opstreams> {
+export interface Surface<T extends keyof Opstreams | void = void> {
 	id: string
+	vibes: LbSet<Vibe>
 	url?: string
-	opstream: Opstreams[T]
-	modes: LbSet<Vibe>
-	view: View<T>
-	workingDirectory: string
-	environmentVariables: typeof environmentVariables
-}
-
-type MaybePromise<T> = T | Promise<T>
-type MaybeCleanup = void | (() => void)
-type ViewReturn = MaybePromise<MaybeCleanup>
-
-export interface View<T extends keyof Opstreams | "noop"> {
-	type: T
-	mount(surface: Surface<T>, element: HTMLElement): ViewReturn
+	opstream?: T extends keyof Opstreams ? Opstreams[T] : void
+	view?: View<T>
 }
 
 export const surfaces = {} as Record<string, Surface<any>>
 
-export function createSurface<T extends keyof Opstreams>(
-	opstream: Opstreams[T],
-	view: View<T>
+export function createSurface<T extends keyof Opstreams | void = void>(
+	url?: string
 ) {
 	const id = Math.random().toString(36).slice(2)
 	const surface: Surface<T> = {
 		id,
-		opstream: opstream,
-		modes: new LbSet<Vibe>(),
-		view,
-		workingDirectory: workingDirectory.toString(),
-		environmentVariables,
+		url,
+		vibes: new LbSet<Vibe>(),
 	}
 	events.emit("preparesurface", surface)
-	// todo should this happen in here or elsewhere?
 	surfaces[id] = surface
 	events.emit("surface", surface)
 	return surface
 }
 
-export async function openSurface<T extends keyof Opstreams>(
-	url: URL | string,
-	view: View<T>
-) {
-	const opstream = await find(url, {with: {type: view.type}})
-	return createSurface(opstream, view)
+export interface View<T extends keyof Opstreams | void = void> {
+	surface: Surface<T>
+	opstream?: T extends keyof Opstreams ? Opstreams[T] : void
+	mount(element: HTMLElement): () => void
 }
+
+export async function openSurface<T extends keyof Opstreams | void = void>(
+	url: URL | string,
+	View: {new (surface: Surface<T>): View<T>; optype: T},
+	area: Area
+) {
+	url = url.toString()
+
+	const opstream = View.optype && (await find(url, {with: {type: View.optype}}))
+	const surface = createSurface<T>(url)
+	surface.opstream = opstream as T extends keyof Opstreams ? Opstreams[T] : void
+	surface.view = new View(surface)
+	area.place(surface.id)
+	return surface
+}
+
+export async function viewOpstream<T extends keyof Opstreams>(
+	opstream: Opstreams[T],
+	View: {new (surface: Surface<T>): View<T>; optype: T},
+	area: Area
+) {
+	const surface = createSurface<T>()
+	surface.opstream = opstream as T extends keyof Opstreams ? Opstreams[T] : void
+	surface.view = new View(surface)
+	area.place(surface.id)
+	return surface
+}
+
+class LittleSurface extends HTMLElement {
+	connectedCallback() {
+		this.style.height = "100%"
+		this.style.width = "100%"
+		const surface = surfaces[this.id]
+		if (!surface) {
+			throw new Error(`Surface not found: ${this.id}`)
+		}
+		surface.view.mount(this)
+	}
+}
+
+customElements.define("little-surface", LittleSurface)
 
 export function createHTMLArea(element: HTMLElement): Area<string[]> {
 	function place(id: string) {
@@ -356,28 +379,6 @@ export const areas = {
 	main: createHTMLArea(mainElement),
 }
 
-export interface View<T extends keyof Opstreams | "noop"> {
-	type: T
-	surface: Surface<T>
-}
-
-export class View<T extends keyof Opstreams | "noop"> extends HTMLElement {
-	constructor() {
-		super()
-		this.style.width = "100%"
-		this.style.height = "100%"
-	}
-}
-
-queueMicrotask(async () => {
-	const dockPath = "/littlebook:system/packages/dock/dock.ts"
-	await import(dockPath)
-	const userScript = "/littlebook:user/init.ts"
-	await import(userScript).catch(error => {
-		console.error(`Failed to load user script "${userScript}":`, error)
-	})
-})
-
 window.__lb_protocols = protocols
 
 declare global {
@@ -395,8 +396,12 @@ export interface Package {
 		<Input extends IOpstream, Output extends IOpstream>(input: Input) => Output
 	>
 	protocols?: Record<string, Protocol>
-	vibes?: Record<string, {new (): Vibe} | (() => Vibe)>
-	views?: Record<string, {new (): View<any>} | (() => View<any>)>
+	vibes?: Record<string, {new (surface: Surface<any>): Vibe} | ((surf) => Vibe)>
+	views?: Record<
+		string,
+		| {new (surface: Surface<any>): View<any>}
+		| ((surface: Surface<any>) => View<any>)
+	>
 }
 
 export interface Packages extends Record<string, Package> {}
@@ -417,52 +422,49 @@ export function registerPackage<P extends Package>(pkg: P): P {
 	return pkg
 }
 
+queueMicrotask(async () => {
+	window.lb = await import(`${"littlebook"}`)
+	const dockPath = "/littlebook:system/packages/dock/dock.ts"
+	await import(dockPath)
+	const textEditorPath = "/littlebook:system/packages/text/text-editor.ts"
+	await import(textEditorPath)
+	const userScript = "/littlebook:user/init.ts"
+	await import(userScript).catch(error => {
+		console.error(`Failed to load user script "${userScript}":`, error)
+	})
+})
+
 // todo should this be a url?
 // rot13+file:// or something?
-// const rot13 = (str: string) =>
-// 	str.replace(/[a-zA-Z]/g, c =>
-// 		String.fromCharCode(c.charCodeAt(0) + (c.toLowerCase() < "n" ? 13 : -13))
-// 	)
+const rot13 = (str: string) =>
+	str.replace(/[a-zA-Z]/g, c =>
+		String.fromCharCode(c.charCodeAt(0) + (c.toLowerCase() < "n" ? 13 : -13))
+	)
 
-// const rot13textstream = (stream: OpStream<string, TextOp>) => {
-// 	return {
-// 		get val() {
-// 			return rot13(stream.val)
-// 		},
-// 		sub(callback: (op: TextOp) => void) {
-// 			return stream.sub(op => {
-// 				if (op.type === "insert") {
-// 					callback({
-// 						...op,
-// 						content: rot13(op.content),
-// 					})
-// 				} else if (op.type === "delete") {
-// 					callback(op)
-// 				} else if (op.type === "replace") {
-// 					callback({
-// 						...op,
-// 						content: rot13(op.content),
-// 					})
-// 				}
-// 			})
-// 		},
-// 		mut(op: TextOp) {
-// 			if (op.type === "insert") {
-// 				stream.mut({
-// 					...op,
-// 					content: rot13(op.content),
-// 				})
-// 			} else if (op.type === "delete") {
-// 				stream.mut(op)
-// 			} else if (op.type === "replace") {
-// 				stream.mut({
-// 					...op,
-// 					content: rot13(op.content),
-// 				})
-// 			}
-// 		},
-// 	}
-// }
+const transrot13 = (opstream: OpstreamText): IOpstreamText => {
+	return {
+		parent: opstream,
+		get value() {
+			return rot13(opstream.value)
+		},
+		connect(callback: (op: TextOp) => void) {
+			return opstream.connect(op => {
+				callback({
+					...op,
+					content: op.content && rot13(op.content),
+				})
+			})
+		},
+		apply(op: TextOp) {
+			opstream.apply({
+				...op,
+				content: op.content && rot13(op.content),
+			})
+		},
+	}
+}
+
+window.transrot13 = transrot13
 
 /* const source = await protocols["file:"](
 	"file:///Users/chee/soft/chee/lb/littlebook/system/littlebook.ts"
