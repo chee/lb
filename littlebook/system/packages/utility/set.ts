@@ -20,7 +20,7 @@ export class LbSet<T> extends Array<T> {
 	}
 
 	deleteAt(index: number) {
-		this.delete(this.at(index))
+		this.delete(this[index])
 		return this
 	}
 

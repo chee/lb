@@ -60,7 +60,7 @@ export default bookstrapOptions
 
 /** @type {import("esbuild").BuildOptions} */
 export const machineOptions = {
-	entryPoints: ["./machine/transformer.ts", "./machine/typescript-worker.ts"],
+	entryPoints: ["./machine/machine.ts", "./machine/typescript-worker.ts"],
 	outdir: `${bookstrapOptions.outdir}/machine`,
 	bundle: true,
 	platform: "browser",

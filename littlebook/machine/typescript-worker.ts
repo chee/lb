@@ -1,7 +1,7 @@
-import typescript from "typescript"
 import * as typescriptVFS from "@typescript/vfs"
 import {createWorker as createCodemirrorTsWorker} from "@valtown/codemirror-ts/worker"
 import * as Comlink from "comlink"
+import typescript from "typescript"
 
 // todo this needs to be settingsable?
 const compilerOptions: typescript.CompilerOptions = {
@@ -40,12 +40,13 @@ const worker = {
 		env: environment,
 		onFileUpdated(_file) {},
 	}) as ReturnType<typeof createCodemirrorTsWorker>,
-	createFile(url: string, content: Uint8Array) {
-		environment.createFile(url, decoder.decode(content))
-		console.log(environment.languageService.getQuickInfoAtPosition(url, 4830))
+	createFile(url: string, content: Uint8Array | string) {
+		environment.createFile(
+			url,
+			typeof content == "string" ? content : decoder.decode(content)
+		)
 	},
 	updateFile(url: string, content: Uint8Array, from?: number, to?: number) {
-		console.log("updating file")
 		if (from != null && to != null) {
 			environment.updateFile(
 				url,

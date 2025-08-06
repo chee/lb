@@ -1,3 +1,6 @@
+var __lb = {}
+window.__lb = __lb as LbPrivate
+
 export type LbFilesystemFileType = "file" | "directory" | "link"
 export interface LbFilesystemStat {
 	size: number
@@ -11,22 +14,25 @@ export interface LbDirEntry {
 }
 
 export interface LbFilesystemLibrary {
-	read: (path: string | URL) => Promise<Uint8Array> | Uint8Array
-	write: (path: string | URL, bytes: Uint8Array) => Promise<void> | void
-	list: (path: string | URL) => Promise<LbDirEntry[]> | LbDirEntry[]
-	stat: (path: string | URL) => Promise<LbFilesystemStat> | LbFilesystemStat
-	mkdir: (
+	read(path: string | URL): Promise<Uint8Array>
+	write(
 		path: string | URL,
-		options?: {parents?: boolean}
-	) => Promise<void> | void
-	rm: (
+		bytes: Uint8Array | ReadableStream<Uint8Array> | string
+	): Promise<void>
+	list(path: string | URL): Promise<LbDirEntry[]>
+	stat(path: string | URL): Promise<LbFilesystemStat>
+	mkdir(path: string | URL, options?: {parents?: boolean}): Promise<void> | void
+	rm(
 		path: string | URL,
 		options?: {recursive?: boolean; force: boolean}
-	) => Promise<void> | void
+	): Promise<void> | void
+	// getFile(path: string | URL, options: {create?: true}): Promise<File>
+	stream(path: string | URL): Promise<ReadableStream<Uint8Array>>
+	// watch?: (path: string | URL) => Promise<AsyncIterable<LbFilesystemStat>>
 }
 
 export interface LbEnvironment extends LbFilesystemLibrary {
-	protocol: string // "file:" or "opfs:"
+	protocol: string // e.g. "file", "opfs", "taurifs"
 	env: Record<string, string>
 	cwd: string | URL
 	systemDirectory: string | URL
@@ -37,12 +43,14 @@ export interface LbEnvironment extends LbFilesystemLibrary {
 }
 
 declare global {
-	var __lb_env: Record<LbEnvironment["protocol"], LbEnvironment>
-	var __lb_native_env: LbEnvironment
+	interface LbPrivate {
+		env: Record<LbEnvironment["protocol"], LbEnvironment>
+		nativeEnv: LbEnvironment
+	}
 }
 
-window.__lb_env = window.__lb_env || {}
-window.__lb_importmap = window.__lb_importmap || {imports: {}, scopes: {}}
+window.__lb.env = window.__lb.env || {}
+window.__lb.importmap = window.__lb.importmap || {imports: {}, scopes: {}}
 
 var envs = ["taurifs", "opfs"] as const
 
@@ -52,15 +60,15 @@ for (var env of envs) {
 	var url = `/envs/${env}/${env}.js`
 	var script = document.createElement("script")
 	script.src = url
-	window.addEventListener(`__lb_env:${env}`, () => {
+	window.addEventListener(`__lb.env:${env}`, () => {
 		count++
 		if (count === envs.length) {
-			window.dispatchEvent(new Event("__lb_env"))
+			window.dispatchEvent(new Event("__lb.env"))
 		}
 	})
 	document.head.appendChild(script)
 	setTimeout(() => {
-		window.dispatchEvent(new Event("__lb_env"))
+		window.dispatchEvent(new Event("__lb.env"))
 	}, 5000)
 }
 

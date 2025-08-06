@@ -18,6 +18,8 @@
 		"build:tauri:littlebook": "LITTLEBOOK_HOST=desktop cd littlebook && node build/build.js"
 	},
 	"dependencies": {
-		"@tauri-apps/cli": "^2.7.1"
+		"@tauri-apps/cli": "^2.7.1",
+		"alien-signals": "^2.0.6",
+		"solid-js": "^1.9.7"
 	}
 }

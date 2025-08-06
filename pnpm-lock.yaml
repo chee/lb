@@ -11,6 +11,12 @@ importers:
       '@tauri-apps/cli':
         specifier: ^2.7.1
         version: 2.7.1
+      alien-signals:
+        specifier: ^2.0.6
+        version: 2.0.6
+      solid-js:
+        specifier: ^1.9.7
+        version: 1.9.7
 
   littlebook:
     dependencies:
@@ -56,6 +62,9 @@ importers:
       '@lezer/highlight':
         specifier: ^1.2.1
         version: 1.2.1
+      '@solidjs/signals':
+        specifier: ^0.3.2
+        version: 0.3.2
       '@tauri-apps/api':
         specifier: ^2.6.0
         version: 2.7.0
@@ -137,6 +146,9 @@ importers:
       '@xterm/xterm':
         specifier: ^5.5.0
         version: 5.5.0
+      cabbages:
+        specifier: ^0.2.8
+        version: 0.2.8
       chokidar:
         specifier: ^4.0.3
         version: 4.0.3
@@ -179,12 +191,18 @@ importers:
       service-worker-types:
         specifier: npm:@types/serviceworker@^0.0.146
         version: '@types/serviceworker@0.0.146'
+      solid-js:
+        specifier: ^1.9.7
+        version: 1.9.7
       source-map:
         specifier: ^0.7.4
         version: 0.7.6
       style-mod:
         specifier: ^4.1.2
         version: 4.1.2
+      sury:
+        specifier: 11.0.0-alpha.2
+        version: 11.0.0-alpha.2
       tauri-plugin-cache-api:
         specifier: ^0.1.5
         version: 0.1.5
@@ -194,6 +212,9 @@ importers:
       tldraw:
         specifier: ^3.14.2
         version: 3.15.0(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      true-myth:
+        specifier: ^9.0.1
+        version: 9.0.1
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -1148,6 +1169,9 @@ packages:
   '@remirror/core-constants@3.0.0':
     resolution: {integrity: sha512-42aWfPrimMfDKDi4YegyS7x+/0tlzaqwPQCULLanv3DMIlu96KTJR0fM5isWX2UViOqlGnX6YFgqWepcX+XMNg==}
 
+  '@solidjs/signals@0.3.2':
+    resolution: {integrity: sha512-Y8oh0xtB4DBluydxjphMQXjBULvoMxouDN/MgrXqN+F3B5UN4QTYEigFdT7KxVzunbNXkyOhOIit1QcgmJ27SQ==}
+
   '@tauri-apps/api@2.3.0':
     resolution: {integrity: sha512-33Z+0lX2wgZbx1SPFfqvzI6su63hCBkbzv+5NexeYjIx7WA9htdOKoRR7Dh3dJyltqS5/J8vQFyybiRoaL0hlA==}
 
@@ -1541,6 +1565,9 @@ packages:
   '@xterm/xterm@5.5.0':
     resolution: {integrity: sha512-hqJHYaQb5OptNunnyAnkHyM8aCjZ1MEIDTQu1iIbbTD/xops91NB5yq1ZK/dC2JDbVWtF23zUtl9JE2NqwT87A==}
 
+  alien-signals@2.0.6:
+    resolution: {integrity: sha512-P3TxJSe31bUHBiblg59oU1PpaWPtmxF9GhJ/cB7OkgJ0qN/ifFSKUI25/v8ZhsT+lIG6ac8DpTOplXxORX6F3Q==}
+
   ansi-styles@4.3.0:
     resolution: {integrity: sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==}
     engines: {node: '>=8'}
@@ -1561,6 +1588,9 @@ packages:
 
   boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
+
+  cabbages@0.2.8:
+    resolution: {integrity: sha512-MGBoLf3n7crhRIRgQJ3kg6o1VZqsrWVD1E2+I87PP9QBQ70k7x+9c6Ybld8M1sMFYkdqzxD1GupSa1/BuSgg8g==}
 
   call-bind-apply-helpers@1.0.2:
     resolution: {integrity: sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==}
@@ -2061,6 +2091,16 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  seroval-plugins@1.3.2:
+    resolution: {integrity: sha512-0QvCV2lM3aj/U3YozDiVwx9zpH0q8A60CTWIv4Jszj/givcudPb48B+rkU5D51NJ0pTpweGMttHjboPa9/zoIQ==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      seroval: ^1.0
+
+  seroval@1.3.2:
+    resolution: {integrity: sha512-RbcPH1n5cfwKrru7v7+zrZvjLurgHhGyso3HTyGtRivGWgYjbOmGuivCQaORNELjNONoK35nj28EoWul9sb1zQ==}
+    engines: {node: '>=10'}
+
   side-channel-list@1.0.0:
     resolution: {integrity: sha512-FCLHtRD/gnpCiCHEiJLOwdmFP+wzCmDEkc9y7NsYxeF4u7Btsn1ZuwgwJGxImImHicJArLP4R0yX4c2KCrMrTA==}
     engines: {node: '>= 0.4'}
@@ -2077,6 +2117,9 @@ packages:
     resolution: {integrity: sha512-ZX99e6tRweoUXqR+VBrslhda51Nh5MTQwou5tnUDgbtyM0dBgmhEDtWGP/xbKn6hqfPRHujUNwz5fy/wbbhnpw==}
     engines: {node: '>= 0.4'}
 
+  solid-js@1.9.7:
+    resolution: {integrity: sha512-/saTKi8iWEM233n5OSi1YHCCuh66ZIQ7aK2hsToPe4tqGm7qAejU1SwNuTPivbWAYq7SjuHVVYxxuZQNRbICiw==}
+
   source-map@0.7.6:
     resolution: {integrity: sha512-i5uvt8C3ikiWeNZSVZNWcfZPItFQOsYTUAOkcUPGd8DqDy1uOUikjt5dG+uRlwyvR108Fb9DOd4GvXfT0N2/uQ==}
     engines: {node: '>= 12'}
@@ -2087,6 +2130,14 @@ packages:
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
+
+  sury@11.0.0-alpha.2:
+    resolution: {integrity: sha512-lWbGQ43NhwcGDFksI0DxyF93u49ljfEOggyTW4xJ/jkEmryiBKgCK3X+x9cSQchXjYFnIw7QbVCSkeDd7wF4Iw==}
+    peerDependencies:
+      rescript: 11.x
+    peerDependenciesMeta:
+      rescript:
+        optional: true
 
   tauri-plugin-cache-api@0.1.5:
     resolution: {integrity: sha512-wNhvhanmB47d18hy7Xom3uY/LRzSM/E7z8SFELPffpVHvNcBLJyWqAqqNkj1WjT+4dr8J45YQmqJMCcKUi0Jyg==}
@@ -2105,6 +2156,10 @@ packages:
     peerDependencies:
       react: ^18.2.0 || ^19.0.0
       react-dom: ^18.2.0 || ^19.0.0
+
+  true-myth@9.0.1:
+    resolution: {integrity: sha512-8ePgamjgV3CKDI43o6eUtid+9iadfEKUiu2WTucbeCnPTyDOQpZ4svCuozLwm9S4hzUolOclsUCJf3yjQg3g/Q==}
+    engines: {node: 18.* || >= 20.*}
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
@@ -3237,6 +3292,8 @@ snapshots:
 
   '@remirror/core-constants@3.0.0': {}
 
+  '@solidjs/signals@0.3.2': {}
+
   '@tauri-apps/api@2.3.0': {}
 
   '@tauri-apps/api@2.7.0': {}
@@ -3655,6 +3712,8 @@ snapshots:
 
   '@xterm/xterm@5.5.0': {}
 
+  alien-signals@2.0.6: {}
+
   ansi-styles@4.3.0:
     dependencies:
       color-convert: 2.0.1
@@ -3672,6 +3731,12 @@ snapshots:
       safe-buffer: 5.1.2
 
   boolbase@1.0.0: {}
+
+  cabbages@0.2.8:
+    dependencies:
+      debug: 4.4.1
+    transitivePeerDependencies:
+      - supports-color
 
   call-bind-apply-helpers@1.0.2:
     dependencies:
@@ -4248,6 +4313,12 @@ snapshots:
 
   semver@7.7.2: {}
 
+  seroval-plugins@1.3.2(seroval@1.3.2):
+    dependencies:
+      seroval: 1.3.2
+
+  seroval@1.3.2: {}
+
   side-channel-list@1.0.0:
     dependencies:
       es-errors: 1.3.0
@@ -4276,6 +4347,12 @@ snapshots:
       side-channel-map: 1.0.1
       side-channel-weakmap: 1.0.2
 
+  solid-js@1.9.7:
+    dependencies:
+      csstype: 3.1.3
+      seroval: 1.3.2
+      seroval-plugins: 1.3.2(seroval@1.3.2)
+
   source-map@0.7.6: {}
 
   style-mod@4.1.2: {}
@@ -4283,6 +4360,8 @@ snapshots:
   supports-color@7.2.0:
     dependencies:
       has-flag: 4.0.0
+
+  sury@11.0.0-alpha.2: {}
 
   tauri-plugin-cache-api@0.1.5:
     dependencies:
@@ -4319,6 +4398,8 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
       - '@types/react-dom'
+
+  true-myth@9.0.1: {}
 
   tslib@2.8.1: {}
 

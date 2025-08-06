@@ -13,10 +13,11 @@
 		"noEmit": true,
 		"isolatedModules": true,
 		"skipLibCheck": true,
-		"strict": false,
+		"strict": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noUncheckedSideEffectImports": true,
+		"useUnknownInCatchVariables": false,
 		"composite": true,
 		"lib": ["ESNext", "DOM", "DOM.Iterable", "DOM.AsyncIterable"],
 		"paths": {
@@ -34,5 +35,5 @@
 		"user",
 		"system/**/*.json"
 	],
-	"exclude": ["machine/service-worker.ts", "bookstrap/build/vfs.js", "build"]
+	"exclude": ["bookstrap/service-worker.ts", "bookstrap/build/vfs.js", "build"]
 }

@@ -8,25 +8,9 @@ import {
 	lineNumbers,
 	rectangularSelection,
 } from "@codemirror/view"
-import {
-	highlightSelectionMatches,
-	search,
-	searchKeymap,
-} from "@codemirror/search"
+import {highlightSelectionMatches, search} from "@codemirror/search"
 import {indentUnit} from "@codemirror/language"
-import {
-	cursorSubwordBackward,
-	cursorSubwordForward,
-	defaultKeymap as codemirrorDefaultKeymap,
-	deleteToLineEnd,
-	// todo add more emacs bindings
-	// todo make a setting
-	emacsStyleKeymap,
-	history,
-	indentWithTab,
-	selectSubwordBackward,
-	selectSubwordForward,
-} from "@codemirror/commands"
+import {history, indentWithTab} from "@codemirror/commands"
 import {Compartment, EditorState, type Extension} from "@codemirror/state"
 
 import theme from "./theme.ts"

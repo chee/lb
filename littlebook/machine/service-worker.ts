@@ -11,15 +11,13 @@ self.addEventListener("install", async () => {
 	await self.skipWaiting()
 })
 
-type Responsish = {body: ReadableStream; init: ResponseInit}
-
-const responseResolvers = new Map<string, PromiseWithResolvers<Responsish>>()
+const responseResolvers = new Map<number, PromiseWithResolvers<Responsish>>()
 
 self.addEventListener("message", async (messageEvent: MessageEvent) => {
 	if (messageEvent.data.type == "response") {
 		const responseItem = responseResolvers.get(messageEvent.data.id)
 		if (!responseItem) {
-			return responseItem.reject(
+			return console.warn(
 				`No read response found for id ${messageEvent.data.id}`
 			)
 		}
@@ -30,6 +28,7 @@ self.addEventListener("message", async (messageEvent: MessageEvent) => {
 	}
 })
 
+let reqcount = 0
 self.addEventListener("fetch", async (fetchEvent: FetchEvent) => {
 	const request = fetchEvent.request
 	if (request.method !== "GET") return fetchEvent.respondWith(fetch(request))
@@ -42,8 +41,7 @@ self.addEventListener("fetch", async (fetchEvent: FetchEvent) => {
 		url.protocol == self.location.protocol
 	) {
 		try {
-			const u = new URL(url.pathname.slice(1))
-			lbImportURL = u
+			lbImportURL = new URL(url.pathname.slice(1))
 		} catch {}
 	}
 
@@ -54,25 +52,32 @@ self.addEventListener("fetch", async (fetchEvent: FetchEvent) => {
 			try {
 				if (lbImportURL) {
 					const client = await self.clients.get(fetchEvent.clientId)
-					const reqid = Math.random().toString(36).slice(2)
+					const reqid = reqcount++
 					const resolvers = Promise.withResolvers<Responsish>()
 					responseResolvers.set(reqid, resolvers)
 
+					if (!client) {
+						throw new Error(
+							`the client has gone missing!!! ${fetchEvent.clientId}. i have NO IDEA what to do`
+						)
+					}
 					client.postMessage({
 						id: reqid,
 						type: "request",
 						url: lbImportURL.toString(),
-						options: {
-							headers: Object.fromEntries(request.headers.entries()),
-							method: request.method,
-							destination: request.destination,
-						},
-					})
+						headers: Object.fromEntries(request.headers.entries()),
+						method: request.method,
+						destination: request.destination,
+						referrer: request.referrer,
+					} satisfies Requestish)
 					fetchEvent.waitUntil(resolvers.promise)
 
 					const responsish = await resolvers.promise
 
-					const response = new Response(responsish.body, responsish.init)
+					const response = new Response(responsish.body, {
+						status: responsish.status,
+						headers: new Headers(responsish.headers),
+					})
 
 					cache.put(fetchEvent.request, response.clone())
 					return response

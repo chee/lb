@@ -1,7 +1,7 @@
 :root,
 [theme] {
-	--dock-fill: var(--workspace-fill);
-	--dock-line: var(--workspace-line);
+	--dock-fill: var(--studio-fill);
+	--dock-line: var(--studio-line);
 	--dock-fill-offset-10: color-mix(
 		in oklab,
 		var(--dock-fill),
@@ -64,10 +64,10 @@
 .dockview-theme-littlebook {
 	--dv-background-color: var(--dock-fill);
 	--dv-separator-border: var(--dock-line);
-	--dv-paneview-active-outline-color: var(--workspace-primary);
+	--dv-paneview-active-outline-color: var(--studio-primary);
 	--dv-drag-over-background-color: color-mix(
 		in oklab,
-		var(--workspace-primary),
+		var(--studio-primary),
 		transparent 50%
 	);
 	--dv-tabs-and-actions-container-font-size: 12px;
@@ -76,7 +76,7 @@
 	--dv-tab-margin: 0;
 	--dv-sash-color: transparent;
 	--dv-tab-font-size: inherit;
-	--dv-active-sash-color: var(--workspace-primary);
+	--dv-active-sash-color: var(--studio-primary);
 	--dv-active-sash-transition-duration: 0.1s;
 	--dv-active-sash-transition-delay: 0.5s;
 	--dv-tabs-and-actions-container-height: 2em;
@@ -94,7 +94,7 @@
 	);
 	--dv-floating-box-shadow: var(--dock-floating-shadow);
 
-	--dv-group-view-background-color: var(--workspace-fill);
+	--dv-group-view-background-color: var(--studio-fill);
 	--dv-tabs-and-actions-container-background-color: color-mix(
 		in oklch,
 		var(--dock-fill-offset-10),

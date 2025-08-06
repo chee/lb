@@ -127,5 +127,8 @@ export function mime<Ext extends string>(
 	filename: Ext | `${string}.${Ext}`
 ): Ext extends keyof Mimes ? Mimes[Ext] : Mimes[keyof Mimes] {
 	const ext = filename.toLowerCase().substring(filename.lastIndexOf(".") + 1)
-	return mimes[ext] || "application/octet-stream"
+	return (mimes[ext as keyof Mimes] ||
+		"application/octet-stream") as Ext extends keyof Mimes
+		? Mimes[Ext]
+		: Mimes[keyof Mimes]
 }

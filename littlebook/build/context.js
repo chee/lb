@@ -28,10 +28,15 @@ export function merge(target, ...sources) {
 
 	if (isObject(target) && isObject(source)) {
 		for (const key in source) {
+			// todo some kind of types
+			// @ts-expect-error
 			if (isObject(source[key])) {
+				// @ts-expect-error
 				if (!target[key]) Object.assign(target, {[key]: {}})
+				// @ts-expect-error
 				merge(target[key], source[key])
 			} else {
+				// @ts-expect-error
 				Object.assign(target, {[key]: source[key]})
 			}
 		}

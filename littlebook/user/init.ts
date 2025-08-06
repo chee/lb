@@ -30,3 +30,7 @@
 // await lb.open(
 // 	lb.nativefs.systemDirectory.toString().concat("core/littlebook.ts")
 // )
+
+import {packages} from "littlebook"
+
+packages.text.settings.extensions.push()

@@ -4,7 +4,7 @@ import type {
 	LbFilesystemStat,
 } from "../../bookstrap.ts"
 ;(async function () {
-	const event = new Event("__lb_env:taurifs")
+	const event = new Event("__lb.env:taurifs")
 	if (!self.__TAURI__) {
 		self.dispatchEvent(event)
 		return
@@ -28,7 +28,15 @@ import type {
 		return tauri.fs.readFile(fixurl(path))
 	}
 
-	async function write(path: string | URL, bytes: Uint8Array) {
+	const encoder = new TextEncoder()
+	async function write(
+		path: string | URL,
+		bytes: Uint8Array | ReadableStream<Uint8Array> | string
+		// todo options of encoding?
+	) {
+		if (typeof bytes === "string") {
+			bytes = encoder.encode(bytes)
+		}
 		return tauri.fs.writeFile(fixurl(path), bytes)
 	}
 
@@ -41,9 +49,9 @@ import type {
 					type: entry.isDirectory
 						? "directory"
 						: entry.isSymlink
-						? "link"
-						: "file",
-				} satisfies LbDirEntry)
+							? "link"
+							: "file",
+				}) satisfies LbDirEntry
 		)
 	}
 
@@ -90,8 +98,8 @@ import type {
 		tauri.path.homeDir(),
 	])
 	cwd = new URL(cwd)
-	const protocol = "taurifs:"
-	home = `${protocol}//${home}`
+	const protocol = "taurifs"
+	home = `${protocol}://${home}`
 
 	cwd.protocol = protocol
 	// todo point at the actual source code in dev
@@ -111,6 +119,7 @@ import type {
 		systemDirectory,
 		userDirectory,
 		rm,
+		// todo is this really part of the fs?
 		async install() {
 			// todo make noop in dev
 			await tauri.core.invoke("install", {
@@ -121,9 +130,53 @@ import type {
 		async uninstall() {
 			await rm(systemDirectory, {recursive: true, force: true})
 		},
+		async stream(path: string | URL) {
+			const chunkSize = 64 * 1024
+			let cursor = 0
+			let fileHandle: InstanceType<typeof tauri.fs.FileHandle> | null = null
+			return new ReadableStream({
+				async start() {
+					try {
+						fileHandle = await tauri.fs.open(path, {read: true})
+					} catch (error) {
+						throw new DOMException(
+							`Failed to open file for streaming: ${error}`,
+							"NotReadableError"
+						)
+					}
+				},
+				async pull(controller) {
+					try {
+						const buffer = new Uint8Array(chunkSize)
+						await fileHandle!.seek(cursor, tauri.fs.SeekMode.Start)
+						const bytesRead = await fileHandle!.read(buffer)
+						if (bytesRead === 0 || bytesRead === null) {
+							controller.close()
+							return
+						}
+						const chunk = buffer.slice(0, bytesRead)
+						controller.enqueue(chunk)
+						cursor += bytesRead
+					} catch (error) {
+						controller.error(
+							new DOMException(
+								`Stream read error: ${error}`,
+								"NotReadableError"
+							)
+						)
+						fileHandle?.close()
+					}
+				},
+				async cancel() {
+					try {
+						await fileHandle!.close()
+					} catch {}
+				},
+			})
+		},
 	} satisfies LbEnvironment
 
-	self.__lb_env = self.__lb_env || {}
-	self.__lb_env.taurifs = host
+	self.__lb.env = self.__lb.env || {}
+	self.__lb.env.taurifs = host
 	self.dispatchEvent(event)
 })()

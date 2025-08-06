@@ -1,6 +1,7 @@
 {
 	"imports": {
 		"littlebook": "/littlebook:system/littlebook.ts",
+		"alien-signals": "https://esm.sh/alien-signals",
 		"dockview-core": "https://esm.sh/dockview-core",
 		"dockview-core/": "https://esm.sh/dockview-core/",
 		"crelt": "https://esm.sh/crelt",
@@ -10,6 +11,12 @@
 		"@lezer/lr": "https://esm.sh/@lezer/lr",
 		"@lezer/common": "https://esm.sh/@lezer/common",
 		"@marijn/find-cluster-break": "https://esm.sh/@marijn/find-cluster-break",
+		"cabbages": "https://esm.sh/cabbages",
+		"solid-js": "https://esm.sh/solid-js",
+		"solid-js/": "https://esm.sh/solid-js/",
+		"@solidjs/signals": "https://esm.sh/@solidjs/signals",
+		"true-myth": "https://esm.sh/true-myth",
+		"sury": "https://esm.sh/sury",
 
 		"@codemirror/lsp-client": "https://esm.sh/@codemirror/lsp-client",
 		"@codemirror/autocomplete": "https://esm.sh/@codemirror/autocomplete",

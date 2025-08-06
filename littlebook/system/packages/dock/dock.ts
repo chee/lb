@@ -1,10 +1,10 @@
 import "./dock.css"
 import json from "./littlebook.json"
 
-import * as littlebook from "littlebook"
-const log = littlebook.log.extend("dock-surface-manager")
 import * as Dockview from "dockview-core"
+import * as littlebook from "littlebook"
 import {createElement} from "/littlebook:system/packages/utility/create-element.ts"
+const log = littlebook.log.extend("dock-surface-manager")
 
 declare module "littlebook" {
 	interface Packages {
@@ -25,7 +25,9 @@ export function activate() {
 	littlebook.packages[json.name] = pkg
 }
 
-export class DockPlace implements littlebook.Area<Dockview.SerializedDockview> {
+export class DockPlace
+	implements littlebook.Layout<Dockview.SerializedDockview>
+{
 	static name = "dock"
 	_dockview: Dockview.DockviewApi
 	element: HTMLElement

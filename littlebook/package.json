@@ -26,6 +26,7 @@
 		"@codemirror/state": "^6.5.2",
 		"@codemirror/view": "^6.38.1",
 		"@lezer/highlight": "^1.2.1",
+		"@solidjs/signals": "^0.3.2",
 		"@tauri-apps/api": "^2.6.0",
 		"@tauri-apps/plugin-cli": "~2.4.0",
 		"@tauri-apps/plugin-clipboard-manager": "~2.3.0",
@@ -53,6 +54,7 @@
 		"@xterm/addon-serialize": "^0.13.0",
 		"@xterm/addon-web-links": "^0.11.0",
 		"@xterm/xterm": "^5.5.0",
+		"cabbages": "^0.2.8",
 		"chokidar": "^4.0.3",
 		"comlink": "^4.4.2",
 		"dockview-core": "^4.4.1",
@@ -67,12 +69,15 @@
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",
 		"service-worker-types": "npm:@types/serviceworker@^0.0.146",
+		"solid-js": "^1.9.7",
 		"source-map": "^0.7.4",
 		"style-mod": "^4.1.2",
+		"sury": "11.0.0-alpha.2",
 		"tauri-plugin-cache-api": "^0.1.5",
 		"tauri-pty": "^0.1.0",
-		"typescript": "^5.8.3",
 		"tldraw": "^3.14.2",
+		"true-myth": "^9.0.1",
+		"typescript": "^5.8.3",
 		"vscode-langservers-extracted": "^4.10.0"
 	}
 }

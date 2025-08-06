@@ -2,7 +2,7 @@
 
 :root,
 [theme] {
-	--terminal-family: var(--workspace-family-code);
+	--terminal-family: var(--studio-family-code);
 	--terminal-font-size: var(--editor-font-size);
 	--terminal-fill: var(--editor-fill);
 	--terminal-line: var(--editor-line);

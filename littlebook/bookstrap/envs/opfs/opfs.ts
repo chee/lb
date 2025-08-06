@@ -34,8 +34,8 @@ class OPFSHostClient implements LbEnvironment {
 		this.propertyPromise = this.getProperties()
 	}
 
-	handleMessage(e) {
-		const {id, result, error} = e.data
+	handleMessage(messageEvent: MessageEvent) {
+		const {id, result, error} = messageEvent.data
 		const pending = this.pendingCalls.get(id)
 
 		if (pending) {
@@ -114,9 +114,14 @@ class OPFSHostClient implements LbEnvironment {
 		await this.callWorker("uninstall")
 	}
 
-	async mkdir(path, options) {
+	async mkdir(path: string | URL, options: {parents?: boolean} = {}) {
 		await this.propertyPromise
 		return await this.callWorker("mkdir", path, options)
+	}
+
+	async stream(path: string | URL) {
+		await this.propertyPromise
+		return await this.callWorker("stream", path.toString())
 	}
 
 	get env() {
@@ -136,7 +141,7 @@ class OPFSHostClient implements LbEnvironment {
 	}
 
 	get protocol() {
-		return this.properties?.protocol || "opfs:"
+		return this.properties?.protocol || "opfs"
 	}
 
 	// Clean up worker when done
@@ -153,10 +158,10 @@ class OPFSHostClient implements LbEnvironment {
 ;(async function () {
 	try {
 		const host = new OPFSHostClient()
-		self.__lb_env = self.__lb_env || {}
-		self.__lb_env.opfs = host
-		self.dispatchEvent(new Event("__lb_env:opfs"))
+		self.__lb.env = self.__lb.env || {}
+		self.__lb.env.opfs = host
+		self.dispatchEvent(new Event("__lb.env:opfs"))
 	} catch {
-		self.dispatchEvent(new Event("__lb_env:opfs"))
+		self.dispatchEvent(new Event("__lb.env:opfs"))
 	}
 })()

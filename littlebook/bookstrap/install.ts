@@ -1,4 +1,3 @@
-import type {LbEnvironment} from "../bookstrap/bookstrap.ts"
 const debugSetting =
 	localStorage.getItem("debug") ?? localStorage.getItem("DEBUG") ?? ""
 const IS_DEBUGGING = debugSetting.match(/(lb|littlebook)?\*/)
@@ -11,27 +10,21 @@ const debug = IS_DEBUGGING
 		)
 	: () => {}
 
-if (Object.keys(window.__lb_env).length == 0) {
-	window.addEventListener("__lb_env", setup, {once: true})
+if (Object.keys(window.__lb.env).length == 0) {
+	window.addEventListener("__lb.env", setup, {once: true})
 } else {
 	setup()
-}
-
-declare global {
-	interface Window {
-		__lb_native_env: LbEnvironment
-	}
 }
 
 /**
  * Install Littlebook onto the user's system.
  */
 async function install() {
-	await window.__lb_native_env.install()
+	await window.__lb.nativeEnv.install()
 }
 
 function setbg(color: string) {
-	Object.assign(document.head.querySelector("style"), {
+	Object.assign(document.head.querySelector("style")!, {
 		textContent: `html{background:${color}}`,
 	})
 }
@@ -41,11 +34,11 @@ async function setup() {
 	performance.mark("setup->start")
 	const textDecoder = new TextDecoder("utf-8")
 	// todo let the user choose
-	window.__lb_native_env = window.__TAURI__
-		? window.__lb_env.taurifs
-		: window.__lb_env.opfs
+	window.__lb.nativeEnv = window.__TAURI__
+		? window.__lb.env.taurifs
+		: window.__lb.env.opfs
 
-	const nativeEnv = window.__lb_native_env
+	const nativeEnv = window.__lb.nativeEnv
 
 	setbg("#f9fcff")
 	performance.mark("install->start")
@@ -57,11 +50,12 @@ async function setup() {
 			await install()
 		} else {
 			const versionFileURL = new URL("zversion", nativeEnv.systemDirectory)
-			let versionFile: Uint8Array
+			let versionFile: Uint8Array | undefined
 
 			try {
 				versionFile = await nativeEnv.read(versionFileURL.toString())
 			} catch {}
+
 			if (!versionFile) {
 				debug("installing: no version file")
 				await install()
@@ -80,7 +74,7 @@ async function setup() {
 	performance.mark("install->end")
 	performance.mark("importmap->start")
 	setbg("#f0fffc")
-	const importmaps: (typeof window.__lb_importmap)[] = []
+	const importmaps: (typeof window.__lb.importmap)[] = []
 	const importmapLocations = [
 		new URL("importmap.json", nativeEnv.systemDirectory),
 		new URL("importmap.json", nativeEnv.userDirectory),
@@ -121,7 +115,7 @@ async function setup() {
 			{imports: {}, scopes: {}}
 		)
 
-		window.__lb_importmap = maps
+		window.__lb.importmap = maps
 	}
 	performance.mark("importmap->end")
 	setbg("#fffafa")
@@ -201,13 +195,13 @@ async function setup() {
 
 	const importmap = Object.assign(document.createElement("script"), {
 		type: "importmap",
-		textContent: JSON.stringify(window.__lb_importmap, null, 2),
+		textContent: JSON.stringify(window.__lb.importmap, null, 2),
 	})
 
 	document.head.append(importmap)
 
 	const script = document.createElement("script")
 	script.type = "module"
-	script.src = "/transformer.js"
+	script.src = "/machine.js"
 	document.head.append(script)
 }

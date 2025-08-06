@@ -1,17 +1,11 @@
+import {render} from "solid-js/web"
 import Codemirror from "./codemirror.ts"
-import {EditorView, ViewPlugin, ViewUpdate} from "@codemirror/view"
-import type {Extension} from "@codemirror/state"
-import type {TextEditorLanguage} from "./languages/languages.ts"
+
+import {type Extension} from "@codemirror/state"
+import {createEffect} from "@solidjs/signals"
+import {log, registerPackage} from "littlebook"
 import {LbSet} from "../utility/set.ts"
-import {
-	log,
-	OpstreamText,
-	registerPackage,
-	SetOp,
-	Surface,
-	TextOp,
-	View,
-} from "littlebook"
+import type {TextEditorLanguage} from "./languages/languages.ts"
 
 declare module "littlebook" {
 	export interface Vibe {
@@ -23,74 +17,25 @@ declare module "littlebook" {
 	}
 }
 
-const OpstreamTextPlugin = (surface: Surface<"text">) =>
-	ViewPlugin.fromClass(
-		class {
-			view: EditorView
-			cleanup: () => void
-			constructor(view: EditorView) {
-				this.view = view
-				this.cleanup = surface.opstream.connect(this.connection)
-			}
-			me = false
+export function getLanguageName(url: string | URL): string | undefined {
+	url = url.toString()
+	return pkg.settings.languagePatterns.find(([pattern]) =>
+		url.match(pattern)
+	)?.[1]
+}
 
-			connection = (op: TextOp | SetOp<string>) => {
-				if (!("agent" in op) || op.agent === surface.id) return
+export function getLanguage(url: string | URL): TextEditorLanguage | undefined {
+	return pkg.settings.languages[getLanguageName(url)!]
+}
 
-				if (!("type" in op)) {
-					this.me = true
-					this.view.dispatch({
-						changes: {
-							from: op.from,
-							to: op.to,
-							insert: op.content,
-						},
-					})
-					this.me = false
-				}
-			}
-			update(update: ViewUpdate) {
-				if (update.docChanged) {
-					for (const tr of update.transactions) {
-						if (this.me) continue
-						if (tr.changes.empty) continue
-						tr.changes.iterChanges((fromA, toA, fromB, toB, text) => {
-							surface.opstream.apply({
-								agent: surface.id,
-								from: fromB,
-								to: toA,
-								content: text.toString(),
-							})
-						})
-					}
-				}
-			}
-			destroy() {
-				this.cleanup()
-			}
-		}
-	)
-
-export class TextEditor implements View<"text"> {
-	static optype = "text"
-	surface: Surface<"text">
-	languageName: string | undefined
-	language: TextEditorLanguage | undefined
-	log: typeof log
-	constructor(surface: Surface<"text">) {
-		this.surface = surface
-		this.languageName = pkg.settings.languagePatterns.find(([pattern]) =>
-			this.surface.url?.toString().match(pattern)
-		)?.[1]
-		this.language = pkg.settings.languages[this.languageName ?? "plain"]
-		this.log = log.extend("text-editor")
-	}
+export class TextEditor {
+	log: typeof log = log
 	mount(element: HTMLElement) {
 		const codemirror = new Codemirror({
-			content: this.surface.opstream.value,
 			parent: element,
-			language: this.language?.(new URL(this.surface.url)),
+			//			language: this.language?.(new URL(this.surface.url)),
 			extensions: [
+				pkg.settings.extensions,
 				// keymap.of([
 				// 	{
 				// 		stopPropagation: true,
@@ -102,12 +47,23 @@ export class TextEditor implements View<"text"> {
 				// 		},
 				// 	},
 				// ]),
-				OpstreamTextPlugin(this.surface),
-				this.surface.vibes
-					.filter(vibe => vibe.codemirrorExtension)
-					.map(vibe => vibe.codemirrorExtension),
+				// OpstreamTextPlugin(this.surface),
+				// this.surface.vibes
+				// 	.filter(vibe => vibe.codemirrorExtension)
+				// 	.map(vibe => vibe.codemirrorExtension),
 			],
 		})
+
+		render(() => {
+			createEffect(
+				() => pkg.settings.extensions,
+				extensions => {
+					codemirror.setExtensions(extensions)
+				}
+			)
+			return codemirror.view.dom
+		}, element)
+
 		return () => {
 			codemirror.view.destroy()
 		}
@@ -119,6 +75,7 @@ var pkg = registerPackage({
 	settings: {
 		languages: {} as Record<string, TextEditorLanguage>,
 		languagePatterns: new LbSet<readonly [RegExp, string]>(),
+		extensions: [] as Extension[],
 	},
 	commands: {},
 	views: {TextEditor},
@@ -131,5 +88,6 @@ export function addLanguage(name: string, language: TextEditorLanguage) {
 export function addLanguagePattern(pattern: RegExp, languageName: string) {
 	const match = [pattern, languageName] as const
 	pkg.settings.languagePatterns.add(match)
+
 	return () => pkg.settings.languagePatterns.delete(match)
 }

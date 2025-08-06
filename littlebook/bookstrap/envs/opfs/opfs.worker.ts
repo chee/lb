@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 
 import type {
+	LbDirEntry,
 	LbEnvironment,
 	LbFilesystemFileType,
 	LbFilesystemStat,
@@ -19,7 +20,7 @@ class OPFSHost implements LbEnvironment {
 		this.env = {}
 		this.systemDirectory = "opfs:///littlebook/system/"
 		this.userDirectory = "opfs:///littlebook/user/"
-		this.protocol = "opfs:"
+		this.protocol = "opfs"
 		this.rootHandle = null
 		this.inited = false
 	}
@@ -42,7 +43,7 @@ class OPFSHost implements LbEnvironment {
 
 		for (const segment of pathSegments) {
 			try {
-				currentHandle = await currentHandle.getDirectoryHandle(segment, {
+				currentHandle = await currentHandle!.getDirectoryHandle(segment, {
 					create,
 				})
 			} catch (error) {
@@ -70,7 +71,7 @@ class OPFSHost implements LbEnvironment {
 		const dirHandle = await this.getDirectoryHandle(dirSegments, create)
 
 		try {
-			return await dirHandle.getFileHandle(fileName, {create})
+			return await dirHandle!.getFileHandle(fileName, {create})
 		} catch (error) {
 			if (error.name === "NotFoundError") {
 				throw new Error(`File not found: ${pathSegments.join("/")}`)
@@ -85,7 +86,7 @@ class OPFSHost implements LbEnvironment {
 		const fileName = pathSegments[pathSegments.length - 1]
 
 		try {
-			await dirHandle.removeEntry(fileName)
+			await dirHandle!.removeEntry(fileName)
 		} catch (error) {
 			if (error.name === "NotFoundError") {
 				throw new Error(`File not found: ${pathSegments.join("/")}`)
@@ -102,30 +103,78 @@ class OPFSHost implements LbEnvironment {
 		return new Uint8Array(arrayBuffer)
 	}
 
-	open = new Set<FileSystemFileHandle>()
+	openFiles = new Set<FileSystemFileHandle>()
 
-	async write(path: string, bytes: Uint8Array) {
+	encoder = new TextEncoder()
+
+	async write(
+		path: string,
+		bytes: Uint8Array | ReadableStream<Uint8Array> | string
+	) {
 		const pathSegments = this.parsePath(path)
 		const fileHandle = await this.getFileHandle(pathSegments, {create: true})
-		if (this.open.has(fileHandle)) {
+		if (this.openFiles.has(fileHandle)) {
 			console.warn(`File already open: ${path}`)
 		}
-		for (const other of this.open) {
-			if (fileHandle.isSameEntry(other)) {
+		for (const other of this.openFiles) {
+			if (await fileHandle.isSameEntry(other)) {
 				console.warn(`File already open: ${path}`)
 				return
 			}
 		}
-		this.open.add(fileHandle)
-
+		if ("createWritable" in fileHandle) {
+			const writable = await fileHandle.createWritable()
+			if (bytes instanceof Uint8Array) {
+				await writable.write(bytes)
+			} else if (bytes instanceof ReadableStream) {
+				await bytes.pipeTo(writable)
+			} else if (typeof bytes == "string") {
+				await writable.write(this.encoder.encode(bytes))
+			} else {
+				throw new TypeError(
+					"bad bytes. should be readable stream, Uint8Array or string",
+					bytes
+				)
+			}
+			await writable.close()
+		}
+		this.openFiles.add(fileHandle)
 		const access = await fileHandle.createSyncAccessHandle()
-		return new Promise<void>(resolve => {
+		return new Promise<void>(async resolve => {
 			access.truncate(0)
-			access.write(bytes)
+			if (bytes instanceof Uint8Array) {
+				access.write(bytes)
+			} else if (bytes instanceof ReadableStream) {
+				for await (const chunk of bytes) {
+					access.write(chunk)
+				}
+			} else if (typeof bytes == "string") {
+				access.write(this.encoder.encode(bytes))
+			} else {
+				throw new TypeError(
+					"should be readable stream, Uint8Array or string",
+					bytes
+				)
+			}
+			// todo do i need this flush
+			access.flush()
 			access.close()
-			this.open.delete(fileHandle)
+			this.openFiles.delete(fileHandle)
 			resolve()
 		})
+	}
+
+	async getFile(path: string) {
+		const pathSegments = this.parsePath(path)
+		const fileHandle = await this.getFileHandle(pathSegments)
+		return await fileHandle.getFile()
+	}
+
+	async stream(path: string) {
+		const pathSegments = this.parsePath(path)
+		const fileHandle = await this.getFileHandle(pathSegments)
+		const file = await fileHandle.getFile()
+		return file.stream()
 	}
 
 	async list(path: string) {
@@ -133,9 +182,9 @@ class OPFSHost implements LbEnvironment {
 		const dirHandle = await this.getDirectoryHandle(pathSegments)
 
 		const entries = []
-		for await (const [name, handle] of dirHandle.entries()) {
+		for await (const [name, handle] of dirHandle!.entries()) {
 			const type = handle.kind === "file" ? "file" : "directory"
-			entries.push({name, type})
+			entries.push({name, type} satisfies LbDirEntry)
 		}
 
 		return entries
@@ -150,7 +199,6 @@ class OPFSHost implements LbEnvironment {
 			return {
 				size: file.size,
 				modified: new Date(file.lastModified),
-
 				type: "file" as LbFilesystemFileType,
 				readonly: false,
 			} satisfies LbFilesystemStat
@@ -182,7 +230,7 @@ class OPFSHost implements LbEnvironment {
 			const dirName = pathSegments[pathSegments.length - 1]
 
 			const parentHandle = await this.getDirectoryHandle(parentSegments)
-			await parentHandle.getDirectoryHandle(dirName, {create: true})
+			await parentHandle!.getDirectoryHandle(dirName, {create: true})
 		}
 	}
 
@@ -214,12 +262,7 @@ self.onmessage = async function (e) {
 			await host.init()
 		}
 
-		/**
-		 *
-		 * @param {any} result
-		 * @param {ArrayBuffer[]} transfer
-		 */
-		function send(result: any, transfer: ArrayBuffer[] = []) {
+		function send(result: any, transfer: Transferable[] = []) {
 			self.postMessage({id, result}, {transfer})
 		}
 
@@ -239,6 +282,10 @@ self.onmessage = async function (e) {
 				break
 			case "mkdir":
 				send(await host.mkdir(args[0], args[1]))
+				break
+			case "stream":
+				const stream = await host.stream(args[0])
+				send(stream, [stream])
 				break
 			case "props":
 				send({
@@ -268,12 +315,17 @@ self.onmessage = async function (e) {
 	}
 }
 
+const encoder = new TextEncoder()
+
 /**
  *
  * @param {object} vfs
  * @param {string} targetPath
  */
-async function materializeVFS(vfs: object, targetPath: string) {
+async function materializeVFS(
+	vfs: {directories: string[]; files: {[key: string]: {content: string}}},
+	targetPath: string
+) {
 	try {
 		//console.debug(`Materializing Littlebook VFS to ${targetPath}`)
 		await host.mkdir(targetPath, {parents: true})
@@ -286,7 +338,7 @@ async function materializeVFS(vfs: object, targetPath: string) {
 
 		for (const [filePath, fileData] of Object.entries(vfs.files)) {
 			const fullFilePath = `${targetPath}/${filePath}`
-			const content = new TextEncoder().encode(fileData.content)
+			const content = encoder.encode(fileData.content)
 			//console.debug(`Writing file: ${fullFilePath}`)
 			await host.write(fullFilePath, content)
 		}
