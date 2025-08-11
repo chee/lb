@@ -87,25 +87,27 @@ type VeryNullable<T> = T | null | undefined | void
 type MaybePromise<T> = T | Promise<T>
 type FastAndLoose<T> = MaybePromise<VeryNullable<T>>
 
-type OnResolveCallback = (args: OnResolveArgs) => FastAndLoose<OnResolveResult>
+export type OnResolveCallback = (
+	args: OnResolveArgs
+) => FastAndLoose<OnResolveResult>
 
-type OnResolve = (
+export type OnResolve = (
 	options: LbMachinePluginHookOptions,
 	callback: OnResolveCallback
 ) => void
 
-type OnReadCallback = (args: OnReadArgs) => FastAndLoose<OnReadResult>
+export type OnReadCallback = (args: OnReadArgs) => FastAndLoose<OnReadResult>
 
-type OnRead = (
+export type OnRead = (
 	options: LbMachinePluginHookOptions,
 	callback: OnReadCallback
 ) => void
 
-type OnTransformCallback = (
+export type OnTransformCallback = (
 	args: OnTransformArgs
 ) => FastAndLoose<OnTransformResult>
 
-type OnTransform = (
+export type OnTransform = (
 	options: LbMachinePluginHookOptions,
 	callback: OnTransformCallback
 ) => void

@@ -1,7 +1,12 @@
+import {LbMachinePlugin} from "../../machine/machine"
+
 export interface Package {
 	name: string
 	settings?: Record<string, any>
 	commands?: Record<string, (...args: any[]) => any>
+	machine?: {
+		plugins?: LbMachinePlugin[]
+	}
 	// trans?: Record<
 	// 	string,
 	// 	<Input extends IOpstream<any, any>, Output extends IOpstream<any, any>>(
